@@ -1,0 +1,17 @@
+% This file was created with JabRef 2.10.
+% Encoding: UTF-8
+
+
+@Book{minsky2017perceptrons,
+  Title                    = {Perceptrons: An introduction to computational geometry},
+  Author                   = {Minsky, Marvin and Papert, Seymour A},
+  Publisher                = {MIT press},
+  Year                     = {2017},
+  Note                     = {Citation - 9818},
+
+  Comment                  = {First paper that talked about the problem of neural network in generating complex function},
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.14},
+  Url                      = {https://books.google.de/books?hl=en&lr=&id=PLQ5DwAAQBAJ&oi=fnd&pg=PR5&dq=minsky+and+papert+&ots=zyLExKvq12&sig=sLoqFcpP9erc6v8S7NYE03bPpx8&redir_esc=y#v=onepage&q=minsky%20and%20papert&f=false}
+}
+
