@@ -1,0 +1,17 @@
+% This file was created with JabRef 2.10.
+% Encoding: UTF-8
+
+
+@InProceedings{vauquois1968survey,
+  Title                    = {A survey of formal grammars and algorithms for recognition and transformation in mechanical translation.},
+  Author                   = {Vauquois, Bernard},
+  Booktitle                = {Ifip congress (2)},
+  Year                     = {1968},
+  Pages                    = {1114--1122},
+  Volume                   = {68},
+
+  Comment                  = {Citation -147},
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.19}
+}
+

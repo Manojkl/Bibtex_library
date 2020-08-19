@@ -2,6 +2,21 @@
 % Encoding: UTF-8
 
 
+@InProceedings{he2016deep,
+  Title                    = {Deep residual learning for image recognition},
+  Author                   = {He, Kaiming and Zhang, Xiangyu and Ren, Shaoqing and Sun, Jian},
+  Booktitle                = {Proceedings of the IEEE conference on computer vision and pattern recognition},
+  Year                     = {2016},
+  Note                     = {Citation - 52731},
+  Pages                    = {770--778},
+
+  Abstract                 = {Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions with reference to the layer inputs, instead of learning unreferenced functions. We provide comprehensive empirical evidence showing that these residual networks are easier to optimize, and can gain accuracy from considerably increased depth. On the ImageNet dataset we evaluate residual nets with a depth of up to 152 layers—8× deeper than VGG nets [40] but still having lower complexity. An ensemble of these residual nets achieves 3.57% error on the ImageNet test set. This result won the 1st place on the ILSVRC 2015 classification task. We also present analysis on CIFAR-10 with 100 and 1000 layers. The depth of representations is of central importance for many visual recognition tasks. Solely due to our extremely deep representations, we obtain a 28% relative improvement on the COCO object detection dataset. Deep residual nets are foundations of our submissions to ILSVRC & COCO 2015 competitions1, where we also won the 1st places on the tasks of ImageNet detection, ImageNet localization, COCO detection, and COCO segmentation.},
+  Comment                  = {MS Resnet},
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.14},
+  Url                      = {https://openaccess.thecvf.com/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf}
+}
+
 @Book{minsky2017perceptrons,
   Title                    = {Perceptrons: An introduction to computational geometry},
   Author                   = {Minsky, Marvin and Papert, Seymour A},
@@ -13,5 +28,81 @@
   Owner                    = {manoj},
   Timestamp                = {2020.08.14},
   Url                      = {https://books.google.de/books?hl=en&lr=&id=PLQ5DwAAQBAJ&oi=fnd&pg=PR5&dq=minsky+and+papert+&ots=zyLExKvq12&sig=sLoqFcpP9erc6v8S7NYE03bPpx8&redir_esc=y#v=onepage&q=minsky%20and%20papert&f=false}
+}
+
+@Article{simonyan2014very,
+  Title                    = {Very deep convolutional networks for large-scale image recognition},
+  Author                   = {Simonyan, Karen and Zisserman, Andrew},
+  Journal                  = {arXiv preprint arXiv:1409.1556},
+  Year                     = {2014},
+  Note                     = {Citation - 42522},
+
+  Abstract                 = {In this work we investigate the effect of the convolutional network depth on its accuracy in the large-scale image recognition setting. Our main contribution is a thorough evaluation of networks of increasing depth using an architecture with very small (3×3) convolution filters, which shows that a significant improvement on the prior-art configurations can be achieved by pushing the depth to 16–19 weight layers. These findings were the basis of our ImageNet Challenge 2014 submission, where our team secured the first and the second places in the localisation and classification tracks respectively. We also show that our representations generalise well to other datasets, where they achieve state-of-the-art results. We have made our two best-performing ConvNet models publicly available to facilitate further research on the use of deep visual representations in computer vision.},
+  Comment                  = {Alexnet},
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.14},
+  Url                      = {https://arxiv.org/pdf/1409.1556.pdf%20http://arxiv.org/abs/1409.1556}
+}
+
+@InProceedings{szegedy2015going,
+  Title                    = {Going deeper with convolutions},
+  Author                   = {Szegedy, Christian and Liu, Wei and Jia, Yangqing and Sermanet, Pierre and Reed, Scott and Anguelov, Dragomir and Erhan, Dumitru and Vanhoucke, Vincent and Rabinovich, Andrew},
+  Booktitle                = {Proceedings of the IEEE conference on computer vision and pattern recognition},
+  Year                     = {2015},
+  Note                     = {Citation - 23343},
+  Pages                    = {1--9},
+
+  Abstract                 = {We propose a deep convolutional neural network architecture codenamed Inception that achieves the new state of the art for classification and detection in the ImageNet Large-Scale Visual Recognition Challenge 2014 (ILSVRC14). The main hallmark of this architecture is the improved utilization of the computing resources inside the network. By a carefully crafted design, we increased the depth and width of the network while keeping the computational budget constant. To optimize quality, the architectural decisions were based on the Hebbian principle and the intuition of multi-scale processing. One particular incarnation used in our submission for ILSVRC14 is called GoogLeNet, a 22 layers deep network, the quality of which is assessed in the context of classification and detection.},
+  Comment                  = {GoogleNet},
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.14},
+  Url                      = {https://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Szegedy_Going_Deeper_With_2015_CVPR_paper.pdf}
+}
+
+@Article{werbos1990backpropagation,
+  Title                    = {Backpropagation through time: what it does and how to do it},
+  Author                   = {Werbos, Paul J},
+  Journal                  = {Proceedings of the IEEE},
+  Year                     = {1990},
+  Note                     = {Citations - 4271},
+  Number                   = {10},
+  Pages                    = {1550--1560},
+  Volume                   = {78},
+
+  Abstract                 = {Basic backpropagation, which is a simple method now being widely used in areas like pattern recognition and fault diagnosis, is reviewed. The basic equations for backpropagation through time, and applications to areas like pattern recognition involving dynamic systems, systems identification, and control are discussed. Further extensions of this method, to deal with systems other than neural networks, systems involving simultaneous equations, or true recurrent networks, and other practical issues arising with the method are described. Pseudocode is provided to clarify the algorithms. The chain rule for ordered derivatives-the theorem which underlies backpropagation-is briefly discussed. The focus is on designing a simpler version of backpropagation which can be translated into computer code and applied directly by neutral network users.< >},
+  Comment                  = {Backpropagation algorithm},
+  Owner                    = {manoj},
+  Publisher                = {IEEE},
+  Timestamp                = {2020.08.14},
+  Url                      = {http://axon.cs.byu.edu/Dan/678/papers/Recurrent/Werbos.pdf}
+}
+
+@InProceedings{zeiler2014visualizing,
+  Title                    = {Visualizing and understanding convolutional networks},
+  Author                   = {Zeiler, Matthew D and Fergus, Rob},
+  Booktitle                = {European conference on computer vision},
+  Year                     = {2014},
+  Note                     = {CItation - 9873},
+  Organization             = {Springer},
+  Pages                    = {818--833},
+
+  Abstract                 = {Large Convolutional Network models have recently demonstrated impressive classification performance on the ImageNet benchmark Krizhevsky et al. [18]. However there is no clear understanding of why they perform so well, or how they might be improved. In this paper we explore both issues. We introduce a novel visualization technique that gives insight into the function of intermediate feature layers and the operation of the classifier. Used in a diagnostic role, these visualizations allow us to find model architectures that outperform Krizhevsky et al. on the ImageNet classification benchmark. We also perform an ablation study to discover the performance contribution from different model layers. We show our ImageNet model generalizes well to other datasets: when the softmax classifier is retrained, it convincingly beats the current state-ofthe-art results on Caltech-101 and Caltech-256 datasets},
+  Comment                  = {ZFnet},
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.14},
+  Url                      = {https://link.springer.com/content/pdf/10.1007/978-3-319-10590-1_53.pdf}
+}
+
+@Article{zhang2016deep,
+  Title                    = {Deep spatio-temporal residual networks for citywide crowd flows prediction},
+  Author                   = {Zhang, Junbo and Zheng, Yu and Qi, Dekang},
+  Journal                  = {arXiv preprint arXiv:1610.00081},
+  Year                     = {2016},
+
+  Abstract                 = {Forecasting the flow of crowds is of great importance to traffic management and public safety, and very challenging as it is affected by many complex factors, such as inter-region traffic, events, and weather. We propose a deep-learning-based approach, called ST-ResNet, to collectively forecast the inflow and outflow of crowds in each and every region of a city. We design an end-to-end structure of ST-ResNet based on unique properties of spatio-temporal data. More specifically, we employ the residual neural network framework to model the temporal closeness, period, and trend properties of crowd traffic. For each property, we design a branch of residual convolutional units, each of which models the spatial properties of crowd traffic. ST-ResNet learns to dynamically aggregate the output of the three residual neural networks based on data, assigning different weights to different branches and regions. The aggregation is further combined with external factors, such as weather and day of the week, to predict the final traffic of crowds in each and every region. Experiments on two types of crowd flows in Beijing and New York City (NYC) demonstrate that the proposed ST-ResNet outperforms six well-known methods.},
+  Comment                  = {MS Resnet},
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.15},
+  Url                      = {https://arxiv.org/pdf/1610.00081}
 }
 
