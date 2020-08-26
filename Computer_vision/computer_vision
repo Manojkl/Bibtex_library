@@ -331,4 +331,34 @@ In this paper, we present the Visual Genome dataset to enable the modeling of su
   url       = {http://openaccess.thecvf.com/content_cvpr_2016/papers/Cordts_The_Cityscapes_Dataset_CVPR_2016_paper.pdf},
 }
 
+@InProceedings{goyal2017something,
+  author    = {Goyal, Raghav and Kahou, Samira Ebrahimi and Michalski, Vincent and Materzynska, Joanna and Westphal, Susanne and Kim, Heuna and Haenel, Valentin and Fruend, Ingo and Yianilos, Peter and Mueller-Freitag, Moritz and others},
+  booktitle = {ICCV},
+  title     = {The" Something Something" Video Database for Learning and Evaluating Visual Common Sense.},
+  year      = {2017},
+  number    = {4},
+  pages     = {5},
+  volume    = {1},
+  abstract  = {Neural networks trained on datasets such as ImageNet have led to major advances in visual object classification. One obstacle that prevents networks from reasoning more deeply about complex scenes and situations, and from integrating visual knowledge with natural language, like humans do, is their lack of common sense knowledge about the physical world. Videos, unlike still images, contain a wealth of detailed information about the physical world. However, most labelled video datasets represent high-level concepts rather than detailed physical aspects about actions and scenes. In this work, we describe our ongoing collection of the “something-something” database of video prediction tasks whose solutions require a common sense understanding of the depicted situation. The database currently contains more than 100,000 videos across 174 classes, which are defined as caption-templates. We also describe the challenges in crowd-sourcing this data at scale.},
+  comment   = {VCR dataset. Citations - 191},
+  owner     = {manoj},
+  timestamp = {2020.08.26},
+  url       = {http://openaccess.thecvf.com/content_ICCV_2017/papers/Goyal_The_Something_Something_ICCV_2017_paper.pdf},
+}
+
+@InProceedings{kirillov2019panoptic,
+  author    = {Kirillov, Alexander and He, Kaiming and Girshick, Ross and Rother, Carsten and Doll{\'a}r, Piotr},
+  booktitle = {Proceedings of the IEEE conference on computer vision and pattern recognition},
+  title     = {Panoptic segmentation},
+  year      = {2019},
+  pages     = {9404--9413},
+  abstract  = {We propose and study a task we name panoptic segmentation (PS). Panoptic segmentation unifies the typically distinct tasks of semantic segmentation (assign a class label to each pixel) and instance segmentation (detect and segment each object instance). The proposed task requires generating a coherent scene segmentation that is rich and complete, an important step toward real-world vision systems. While early work in computer vision addressed related image/scene parsing tasks, these are not currently
+popular, possibly due to lack of appropriate metrics or associated recognition challenges. To address this, we propose a novel panoptic quality (PQ) metric that captures performance for all classes (stuff and things) in an interpretable and unified manner. Using the proposed metric, we perform a rigorous study of both human and machine performance for PS on three existing datasets, revealing interesting insights about the task. The aim of our work is to revive the interest of the community in a more unified
+view of image segmentation. For more analysis and up-todate results, please check the arXiv version of the paper: https://arxiv.org/abs/1801.00868.},
+  comment   = {Panoptic segmentation. CItations - 199},
+  owner     = {manoj},
+  timestamp = {2020.08.26},
+  url       = {http://openaccess.thecvf.com/content_CVPR_2019/papers/Kirillov_Panoptic_Segmentation_CVPR_2019_paper.pdf},
+}
+
 @Comment{jabref-meta: databaseType:bibtex;}
