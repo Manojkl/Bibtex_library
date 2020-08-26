@@ -1,0 +1,167 @@
+% Encoding: UTF-8
+
+
+@InProceedings{drachen2014skill,
+  Title                    = {Skill-based differences in spatio-temporal team behaviour in defence of the ancients 2 (dota 2)},
+  Author                   = {Drachen, Anders and Yancey, Matthew and Maguire, John and Chu, Derrek and Wang, Iris Yuhui and Mahlmann, Tobias and Schubert, Matthias and Klabajan, Diego},
+  Booktitle                = {2014 IEEE Games Media Entertainment},
+  Year                     = {2014},
+  Organization             = {IEEE},
+  Pages                    = {1--8},
+
+  Abstract                 = {Multiplayer Online Battle Arena (MOBA) games are among the most played digital games in the world. In these games, teams of players fight against each other in arena environments, and the gameplay is focused on tactical combat. Mastering MOBAs requires extensive practice, as is exemplified in the popular MOBA Defence of the Ancients 2 (DotA 2). In this paper, we present three data-driven measures of spatio-temporal behavior in DotA 2: 1) Zone changes; 2) Distribution of team members and: 3) Time series clustering via a fuzzy approach. We present a method for obtaining accurate positional data from DotA 2. We investigate how behavior varies across these measures as a function of the skill level of teams, using four tiers from novice to professional players. Results indicate that spatio-temporal behavior of MOBA teams is related to team skill, with professional teams having smaller within-team distances and conducting more zone changes than amateur teams. The temporal distribution of the within-team distances of professional and high-skilled teams also generally follows patterns distinct from lower skill ranks.},
+  Comment                  = {Defence of ancients. Citations - 77},
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.21},
+  Url                      = {http://www.academia.edu/download/57772177/1603.07738.pdf}
+}
+
+@Article{edelman1997computational,
+  Title                    = {Computational theories of object recognition},
+  Author                   = {Edelman, Shimon},
+  Journal                  = {Trends in cognitive sciences},
+  Year                     = {1997},
+  Number                   = {8},
+  Pages                    = {296--304},
+  Volume                   = {1},
+
+  Abstract                 = {This paper examines four current theoretical approaches to the representation and recognition of visual objects: structural descriptions, geometric constraints, multidimensional feature spaces and shape-space approximation. The strengths and weaknesses of the four theories are considered, with a special focus on their approach to categorization—a computationally challenging task which is not widely addressed in computer vision, where the stress is rather on the generalization of recognition across changes of viewpoint.},
+  Comment                  = {Object recognition. Citation - 194},
+  Owner                    = {manoj},
+  Publisher                = {Elsevier},
+  Timestamp                = {2020.08.26},
+  Url                      = {http://cogprints.org/560/2/199710002.ps}
+}
+
+@Article{fukushima2007neocognitron,
+  Title                    = {Neocognitron},
+  Author                   = {Fukushima, Kunihiko},
+  Journal                  = {Scholarpedia},
+  Year                     = {2007},
+  Number                   = {1},
+  Pages                    = {1717},
+  Volume                   = {2},
+
+  Comment                  = {Citation - 147},
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.20},
+  Url                      = {http://var.scholarpedia.org/article/Neocognitron}
+}
+
+@Article{lecun1989backpropagation,
+  Title                    = {Backpropagation applied to handwritten zip code recognition},
+  Author                   = {LeCun, Yann and Boser, Bernhard and Denker, John S and Henderson, Donnie and Howard, Richard E and Hubbard, Wayne and Jackel, Lawrence D},
+  Journal                  = {Neural computation},
+  Year                     = {1989},
+  Number                   = {4},
+  Pages                    = {541--551},
+  Volume                   = {1},
+
+  Owner                    = {manoj},
+  Publisher                = {MIT Press},
+  Timestamp                = {2020.08.20}
+}
+
+@Article{lin2016masked,
+  Title                    = {Masked face detection via a modified LeNet},
+  Author                   = {Lin, Shaohui and Cai, Ling and Lin, Xianming and Ji, Rongrong},
+  Journal                  = {Neurocomputing},
+  Year                     = {2016},
+  Pages                    = {197--202},
+  Volume                   = {218},
+
+  Abstract                 = {Detecting masked faces in the wild has been emerging recently, which has rich applications ranging from violence video retrieval to video surveillance. Its accurate detection retains as an open problem, mainly due to the difficulties of low-resolution and arbitrary viewing angles, as well as the limitation of collecting sufficient amount of training samples. Such difficulties have been significantly challenged the design of effective handcraft features as well as robust detectors. In this paper, we tackle these problems by proposing a learn-based feature design and classifier training paradigm. More particularly, a modified LeNet, termed MLeNet, is presented, which modifies the number of units in output layer of LeNet to suit for a specific classification. Meanwhile, MLeNet further increases the number of feature maps with smaller filter size. To further reduce overfitting and improve the performance with a small quantity of training samples, we firstly increase the training dataset by horizontal reflection and then learn MLeNet via combining both pre-training and fine-tuning. We evaluate the proposed model on a real-world masked face detection dataset. Quantitative evaluations over several state-of-the-arts and alternative solution have demonstrated the accuracy and robustness of the proposed model.},
+  Comment                  = {Citation - 12},
+  Owner                    = {manoj},
+  Publisher                = {Elsevier},
+  Timestamp                = {2020.08.20},
+  Url                      = {https://www.sciencedirect.com/science/article/abs/pii/S0925231216309523}
+}
+
+@Article{moravvcik2017deepstack,
+  Title                    = {Deepstack: Expert-level artificial intelligence in heads-up no-limit poker},
+  Author                   = {Morav{\v{c}}{\'\i}k, Matej and Schmid, Martin and Burch, Neil and Lis{\`y}, Viliam and Morrill, Dustin and Bard, Nolan and Davis, Trevor and Waugh, Kevin and Johanson, Michael and Bowling, Michael},
+  Journal                  = {Science},
+  Year                     = {2017},
+  Number                   = {6337},
+  Pages                    = {508--513},
+  Volume                   = {356},
+
+  Abstract                 = {Artificial intelligence has seen several breakthroughs in recent years, with games often serving as milestones. A common feature of these games is that players have perfect information. Poker is the quintessential game of imperfect information, and a longstanding challenge problem in artificial intelligence. We introduce DeepStack, an algorithm for imperfect information settings. It combines recursive reasoning to handle information asymmetry, decomposition to focus computation on the relevant decision, and a form of intuition that is automatically learned from self-play using deep learning. In a study involving 44,000 hands of poker, DeepStack defeated with statistical significance professional poker players in heads-up no-limit Texas hold’em. The approach is
+theoretically sound and is shown to produce more difficult to exploit strategies than prior approaches.},
+  Comment                  = {Deepstack poker game. Citation - 424},
+  Owner                    = {manoj},
+  Publisher                = {American Association for the Advancement of Science},
+  Timestamp                = {2020.08.21},
+  Url                      = {https://arxiv.org/pdf/1701.01724}
+}
+
+@InProceedings{oh2015action,
+  Title                    = {Action-conditional video prediction using deep networks in atari games},
+  Author                   = {Oh, Junhyuk and Guo, Xiaoxiao and Lee, Honglak and Lewis, Richard L and Singh, Satinder},
+  Booktitle                = {Advances in neural information processing systems},
+  Year                     = {2015},
+  Pages                    = {2863--2871},
+
+  Abstract                 = {Motivated by vision-based reinforcement learning (RL) problems, in particular Atari games from the recent benchmark Aracade Learning Environment (ALE), we consider spatio-temporal prediction problems where future image-frames depend on control variables or actions as well as previous frames. While not composed of natural scenes, frames in Atari games are high-dimensional in size, can involve tens of objects with one or more objects being controlled by the actions directly and many other objects being influenced indirectly, can involve entry and departure of objects, and can involve deep partial observability. We propose and evaluate two deep neural network architectures that consist of encoding, actionconditional transformation, and decoding layers based on convolutional neural networks and recurrent neural networks. Experimental results show that the proposed architectures are able to generate visually-realistic frames that are also useful for control over approximately 100-step action-conditional futures in some games. To the best of our knowledge, this paper is the first to make and evaluate long-term predictions on high-dimensional video conditioned by control inputs.},
+  Comment                  = {Atari games by deep neural network. Citation -},
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.21},
+  Url                      = {http://papers.nips.cc/paper/5859-action-conditional-video-prediction-using-deep-networks-in-atari-games.pdf}
+}
+
+@Article{silver2017mastering,
+  Title                    = {Mastering the game of go without human knowledge},
+  Author                   = {Silver, David and Schrittwieser, Julian and Simonyan, Karen and Antonoglou, Ioannis and Huang, Aja and Guez, Arthur and Hubert, Thomas and Baker, Lucas and Lai, Matthew and Bolton, Adrian and others},
+  Journal                  = {nature},
+  Year                     = {2017},
+  Number                   = {7676},
+  Pages                    = {354--359},
+  Volume                   = {550},
+
+  Abstract                 = {A long-standing goal of artificial intelligence is an algorithm that learns, tabula rasa, superhuman proficiency in challenging domains. Recently, AlphaGo became the first program to defeat a world champion in the game of Go. The tree search in AlphaGo evaluated positions and selected moves using deep neural networks. These neural networks were trained by supervised learning from human expert moves, and by reinforcement learning from selfplay. Here, we introduce an algorithm based solely on reinforcement learning, without human data, guidance, or domain knowledge beyond game rules. AlphaGo becomes its own teacher: a neural network is trained to predict AlphaGo’s own move selections and also the winner of AlphaGo’s games. This neural network improves the strength of tree search, resulting in higher quality move selection and stronger self-play in the next iteration. Starting tabula rasa, our new program AlphaGo Zero achieved superhuman performance, winning 100-0 against the previously published, champion-defeating AlphaGo.},
+  Comment                  = {Go game. CItation - 3950},
+  Owner                    = {manoj},
+  Publisher                = {Nature Publishing Group},
+  Timestamp                = {2020.08.21},
+  Url                      = {https://discovery.ucl.ac.uk/id/eprint/10045895/1/agz_unformatted_nature.pdf}
+}
+
+@Article{turk1991eigenfaces,
+  Title                    = {Eigenfaces for recognition},
+  Author                   = {Turk, Matthew and Pentland, Alex},
+  Journal                  = {Journal of cognitive neuroscience},
+  Year                     = {1991},
+  Number                   = {1},
+  Pages                    = {71--86},
+  Volume                   = {3},
+
+  Abstract                 = {We have developed a near-real-time computer system that can locate and track a subject’s head, and then recognize the person by comparing characteristics of the face to those of known individuals. The computational approach taken in this system is motivated by both physiology and information theory, as well as by the practical requirements of near-real-time performance and accuracy. Our approach treats the face recognition problem as an intrinsically two-dimensional (2-D) recognition problem rather than requiring recovery of threedimensional geometry, taking advantage of the fact that faces are normally upright and thus may be described by a small set of 2-D characteristic views. The system functions by projecting face images onto a feature space that spans the significant variations among known face images. The significant features are known as “eigenfaces,” because they are the eigenvectors (principal components) of the set of faces; they do not necessarily correspond to features such as eyes, ears, and noses. The projection operation characterizes an individual face by a weighted sum of the eigenface features, and so to recognize a particular face it is necessary only to compare these weights to those of known individuals. Some particular advantages of our approach are that it provides for the ability to learn and later recognize new faces in an unsupervised manner, and that it is easy to implement using a neural network architecture.},
+  Comment                  = {Eigenfaces. Citations - 18834},
+  Owner                    = {manoj},
+  Publisher                = {MIT Press},
+  Timestamp                = {2020.08.26},
+  Url                      = {https://www.mitpressjournals.org/doi/pdfplus/10.1162/jocn.1991.3.1.71}
+}
+
+@Article{wang2016does,
+  Title                    = {Where does AlphaGo go: From church-turing thesis to AlphaGo thesis and beyond},
+  Author                   = {Wang, Fei-Yue and Zhang, Jun Jason and Zheng, Xinhu and Wang, Xiao and Yuan, Yong and Dai, Xiaoxiao and Zhang, Jie and Yang, Liuqing},
+  Journal                  = {IEEE/CAA Journal of Automatica Sinica},
+  Year                     = {2016},
+  Number                   = {2},
+  Pages                    = {113--120},
+  Volume                   = {3},
+
+  Owner                    = {manoj},
+  Publisher                = {IEEE},
+  Timestamp                = {2020.08.21},
+  Url                      = {http://159.226.21.68/bitstream/173211/11604/1/Where%20does%20AlphaGo%20go%EF%BC%9A%20from%20Church-Turing%20Thesis%20to%20AlphaGo%20Thesis%20and%20beyond.pdf}
+}
+
+@Article{,
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.20}
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}
