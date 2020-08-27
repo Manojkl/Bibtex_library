@@ -1,0 +1,1608 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>JabRef references</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script type="text/javascript">
+<!--
+// QuickSearch script for JabRef HTML export 
+// Version: 3.0
+//
+// Copyright (c) 2006-2011, Mark Schenk
+//
+// This software is distributed under a Creative Commons Attribution 3.0 License
+// http://creativecommons.org/licenses/by/3.0/
+//
+// Features:
+// - intuitive find-as-you-type searching
+//    ~ case insensitive
+//    ~ ignore diacritics (optional)
+//
+// - search with/without Regular Expressions
+// - match BibTeX key
+//
+
+// Search settings
+var searchAbstract = true;	// search in abstract
+var searchComment = true;	// search in comment
+
+var noSquiggles = true; 	// ignore diacritics when searching
+var searchRegExp = false; 	// enable RegExp searches
+
+
+if (window.addEventListener) {
+	window.addEventListener("load",initSearch,false); }
+else if (window.attachEvent) {
+	window.attachEvent("onload", initSearch); }
+
+function initSearch() {
+	// check for quick search table and searchfield
+	if (!document.getElementById('qs_table')||!document.getElementById('quicksearch')) { return; }
+
+	// load all the rows and sort into arrays
+	loadTableData();
+	
+	//find the query field
+	qsfield = document.getElementById('qs_field');
+
+	// previous search term; used for speed optimisation
+	prevSearch = '';
+
+	//find statistics location
+	stats = document.getElementById('stat');
+	setStatistics(-1);
+	
+	// set up preferences
+	initPreferences();
+
+	// shows the searchfield
+	document.getElementById('quicksearch').style.display = 'block';
+	document.getElementById('qs_field').onkeyup = quickSearch;
+}
+
+function loadTableData() {
+	// find table and appropriate rows
+	searchTable = document.getElementById('qs_table');
+	var allRows = searchTable.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+	// split all rows into entryRows and infoRows (e.g. abstract, comment, bibtex)
+	entryRows = new Array(); infoRows = new Array(); absRows = new Array(); revRows = new Array();
+
+	// get data from each row
+	entryRowsData = new Array(); absRowsData = new Array(); revRowsData = new Array(); 
+	
+	BibTeXKeys = new Array();
+	
+	for (var i=0, k=0, j=0; i<allRows.length;i++) {
+		if (allRows[i].className.match(/entry/)) {
+			entryRows[j] = allRows[i];
+			entryRowsData[j] = stripDiacritics(getTextContent(allRows[i]));
+			allRows[i].id ? BibTeXKeys[j] = allRows[i].id : allRows[i].id = 'autokey_'+j;
+			j ++;
+		} else {
+			infoRows[k++] = allRows[i];
+			// check for abstract/comment
+			if (allRows[i].className.match(/abstract/)) {
+				absRows.push(allRows[i]);
+				absRowsData[j-1] = stripDiacritics(getTextContent(allRows[i]));
+			} else if (allRows[i].className.match(/comment/)) {
+				revRows.push(allRows[i]);
+				revRowsData[j-1] = stripDiacritics(getTextContent(allRows[i]));
+			}
+		}
+	}
+	//number of entries and rows
+	numEntries = entryRows.length;
+	numInfo = infoRows.length;
+	numAbs = absRows.length;
+	numRev = revRows.length;
+}
+
+function quickSearch(){
+	
+	tInput = qsfield;
+
+	if (tInput.value.length == 0) {
+		showAll();
+		setStatistics(-1);
+		qsfield.className = '';
+		return;
+	} else {
+		t = stripDiacritics(tInput.value);
+
+		if(!searchRegExp) { t = escapeRegExp(t); }
+			
+		// only search for valid RegExp
+		try {
+			textRegExp = new RegExp(t,"i");
+			closeAllInfo();
+			qsfield.className = '';
+		}
+			catch(err) {
+			prevSearch = tInput.value;
+			qsfield.className = 'invalidsearch';
+			return;
+		}
+	}
+	
+	// count number of hits
+	var hits = 0;
+
+	// start looping through all entry rows
+	for (var i = 0; cRow = entryRows[i]; i++){
+
+		// only show search the cells if it isn't already hidden OR if the search term is getting shorter, then search all
+		if(cRow.className.indexOf('noshow')==-1 || tInput.value.length <= prevSearch.length){
+			var found = false; 
+
+			if (entryRowsData[i].search(textRegExp) != -1 || BibTeXKeys[i].search(textRegExp) != -1){ 
+				found = true;
+			} else {
+				if(searchAbstract && absRowsData[i]!=undefined) {
+					if (absRowsData[i].search(textRegExp) != -1){ found=true; } 
+				}
+				if(searchComment && revRowsData[i]!=undefined) {
+					if (revRowsData[i].search(textRegExp) != -1){ found=true; } 
+				}
+			}
+			
+			if (found){
+				cRow.className = 'entry show';
+				hits++;
+			} else {
+				cRow.className = 'entry noshow';
+			}
+		}
+	}
+
+	// update statistics
+	setStatistics(hits)
+	
+	// set previous search value
+	prevSearch = tInput.value;
+}
+
+
+// Strip Diacritics from text
+// http://stackoverflow.com/questions/990904/javascript-remove-accents-in-strings
+
+// String containing replacement characters for stripping accents 
+var stripstring = 
+    'AAAAAAACEEEEIIII'+
+    'DNOOOOO.OUUUUY..'+
+    'aaaaaaaceeeeiiii'+
+    'dnooooo.ouuuuy.y'+
+    'AaAaAaCcCcCcCcDd'+
+    'DdEeEeEeEeEeGgGg'+
+    'GgGgHhHhIiIiIiIi'+
+    'IiIiJjKkkLlLlLlL'+
+    'lJlNnNnNnnNnOoOo'+
+    'OoOoRrRrRrSsSsSs'+
+    'SsTtTtTtUuUuUuUu'+
+    'UuUuWwYyYZzZzZz.';
+
+function stripDiacritics(str){
+
+    if(noSquiggles==false){
+        return str;
+    }
+
+    var answer='';
+    for(var i=0;i<str.length;i++){
+        var ch=str[i];
+        var chindex=ch.charCodeAt(0)-192;   // Index of character code in the strip string
+        if(chindex>=0 && chindex<stripstring.length){
+            // Character is within our table, so we can strip the accent...
+            var outch=stripstring.charAt(chindex);
+            // ...unless it was shown as a '.'
+            if(outch!='.')ch=outch;
+        }
+        answer+=ch;
+    }
+    return answer;
+}
+
+// http://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex
+// NOTE: must escape every \ in the export code because of the JabRef Export...
+function escapeRegExp(str) {
+  return str.replace(/[-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
+
+function toggleInfo(articleid,info) {
+
+	var entry = document.getElementById(articleid);
+	var abs = document.getElementById('abs_'+articleid);
+	var rev = document.getElementById('rev_'+articleid);
+	var bib = document.getElementById('bib_'+articleid);
+	
+	if (abs && info == 'abstract') {
+		abs.className.indexOf('noshow') == -1?abs.className = 'abstract noshow':abs.className = 'abstract show';
+	} else if (rev && info == 'comment') {
+		rev.className.indexOf('noshow') == -1?rev.className = 'comment noshow':rev.className = 'comment show';
+	} else if (bib && info == 'bibtex') {
+		bib.className.indexOf('noshow') == -1?bib.className = 'bibtex noshow':bib.className = 'bibtex show';
+	} else { 
+		return;
+	}
+
+	// check if one or the other is available
+	var revshow; var absshow; var bibshow;
+	(abs && abs.className.indexOf('noshow') == -1)? absshow = true: absshow = false;
+	(rev && rev.className.indexOf('noshow') == -1)? revshow = true: revshow = false;	
+	(bib && bib.className.indexOf('noshow') == -1)? bibshow = true: bibshow = false;
+	
+	// highlight original entry
+	if(entry) {
+		if (revshow || absshow || bibshow) {
+		entry.className = 'entry highlight show';
+		} else {
+		entry.className = 'entry show';
+		}
+	}
+	
+	// When there's a combination of abstract/comment/bibtex showing, need to add class for correct styling
+	if(absshow) {
+		(revshow||bibshow)?abs.className = 'abstract nextshow':abs.className = 'abstract';
+	} 
+	if (revshow) {
+		bibshow?rev.className = 'comment nextshow': rev.className = 'comment';
+	}	
+	
+}
+
+function setStatistics (hits) {
+	if(hits < 0) { hits=numEntries; }
+	if(stats) { stats.firstChild.data = hits + '/' + numEntries}
+}
+
+function getTextContent(node) {
+	// Function written by Arve Bersvendsen
+	// http://www.virtuelvis.com
+	
+	if (node.nodeType == 3) {
+	return node.nodeValue;
+	} // text node
+	if (node.nodeType == 1 && node.className != "infolinks") { // element node
+	var text = [];
+	for (var chld = node.firstChild;chld;chld=chld.nextSibling) {
+		text.push(getTextContent(chld));
+	}
+	return text.join("");
+	} return ""; // some other node, won't contain text nodes.
+}
+
+function showAll(){
+	closeAllInfo();
+	for (var i = 0; i < numEntries; i++){ entryRows[i].className = 'entry show'; }
+}
+
+function closeAllInfo(){
+	for (var i=0; i < numInfo; i++){
+		if (infoRows[i].className.indexOf('noshow') ==-1) {
+			infoRows[i].className = infoRows[i].className + ' noshow';
+		}
+	}
+}
+
+function clearQS() {
+	qsfield.value = '';
+	showAll();
+}
+
+function redoQS(){
+	showAll();
+	quickSearch(qsfield);
+}
+
+function updateSetting(obj){
+	var option = obj.id;
+	var checked = obj.value;
+
+	switch(option)
+	 {
+	 case "opt_searchAbs":
+	   searchAbstract=!searchAbstract;
+	   redoQS();
+	   break;
+	 case "opt_searchRev":
+	   searchComment=!searchComment;
+	   redoQS();
+	   break;
+	 case "opt_useRegExp":
+	   searchRegExp=!searchRegExp;
+	   redoQS();
+	   break;
+	 case "opt_noAccents":
+	   noSquiggles=!noSquiggles;
+	   loadTableData();
+	   redoQS();
+	   break;
+	 }
+}
+
+function initPreferences(){
+	if(searchAbstract){document.getElementById("opt_searchAbs").checked = true;}
+	if(searchComment){document.getElementById("opt_searchRev").checked = true;}
+	if(noSquiggles){document.getElementById("opt_noAccents").checked = true;}
+	if(searchRegExp){document.getElementById("opt_useRegExp").checked = true;}
+	
+	if(numAbs==0) {document.getElementById("opt_searchAbs").parentNode.style.display = 'none';}
+	if(numRev==0) {document.getElementById("opt_searchRev").parentNode.style.display = 'none';}
+}
+
+function toggleSettings(){
+	var togglebutton = document.getElementById('showsettings');
+	var settings = document.getElementById('settings');
+	
+	if(settings.className == "hidden"){
+		settings.className = "show";
+		togglebutton.innerText = "close settings";
+		togglebutton.textContent = "close settings";
+	}else{
+		settings.className = "hidden";
+		togglebutton.innerText = "settings...";		
+		togglebutton.textContent = "settings...";
+	}
+}
+
+-->
+</script>
+<style type="text/css">
+body { background-color: white; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.2; padding: 1em; color: #2E2E2E; margin: auto 2em; }
+
+form#quicksearch { width: auto; border-style: solid; border-color: gray; border-width: 1px 0px; padding: 0.7em 0.5em; display:none; position:relative; }
+span#searchstat {padding-left: 1em;}
+
+div#settings { margin-top:0.7em; /* border-bottom: 1px transparent solid; background-color: #efefef; border: 1px grey solid; */ }
+div#settings ul {margin: 0; padding: 0; }
+div#settings li {margin: 0; padding: 0 1em 0 0; display: inline; list-style: none; }
+div#settings li + li { border-left: 2px #efefef solid; padding-left: 0.5em;}
+div#settings input { margin-bottom: 0px;}
+
+div#settings.hidden {display:none;}
+
+#showsettings { border: 1px grey solid; padding: 0 0.5em; float:right; line-height: 1.6em; text-align: right; }
+#showsettings:hover { cursor: pointer; }
+
+.invalidsearch { background-color: red; }
+input[type="button"] { background-color: #efefef; border: 1px #2E2E2E solid;}
+
+table { width: 100%; empty-cells: show; border-spacing: 0em 0.2em; margin: 1em 0em; border-style: none; }
+th, td { border: 1px gray solid; border-width: 1px 1px; padding: 0.5em; vertical-align: top; text-align: left; }
+th { background-color: #efefef; }
+td + td, th + th { border-left: none; }
+
+td a { color: navy; text-decoration: none; }
+td a:hover  { text-decoration: underline; }
+
+tr.noshow { display: none;}
+tr.highlight td { background-color: #EFEFEF; border-top: 2px #2E2E2E solid; font-weight: bold; }
+tr.abstract td, tr.comment td, tr.bibtex td { background-color: #EFEFEF; text-align: justify; border-bottom: 2px #2E2E2E solid; }
+tr.nextshow td { border-bottom: 1px gray solid; }
+
+tr.bibtex pre { width: 100%; overflow: auto; white-space: pre-wrap;}
+p.infolinks { margin: 0.3em 0em 0em 0em; padding: 0px; }
+
+@media print {
+	p.infolinks, #qs_settings, #quicksearch, t.bibtex { display: none !important; }
+	tr { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<form action="" id="quicksearch">
+<input type="text" id="qs_field" autocomplete="off" placeholder="Type to search..." /> <input type="button" onclick="clearQS()" value="clear" />
+<span id="searchstat">Matching entries: <span id="stat">0</span></span>
+<div id="showsettings" onclick="toggleSettings()">settings...</div>
+<div id="settings" class="hidden">
+<ul>
+<li><input type="checkbox" class="search_setting" id="opt_searchAbs" onchange="updateSetting(this)"><label for="opt_searchAbs"> include abstract</label></li>
+<li><input type="checkbox" class="search_setting" id="opt_searchRev" onchange="updateSetting(this)"><label for="opt_searchRev"> include comment</label></li>
+<li><input type="checkbox" class="search_setting" id="opt_useRegExp" onchange="updateSetting(this)"><label for="opt_useRegExp"> use RegExp</label></li>
+<li><input type="checkbox" class="search_setting" id="opt_noAccents" onchange="updateSetting(this)"><label for="opt_noAccents"> ignore accents</label></li>
+</ul>
+</div>
+</form>
+<table id="qs_table" border="1">
+<thead><tr><th width="20%">Author</th><th width="30%">Title</th><th width="5%">Year</th><th width="30%">Journal/Proceedings</th><th width="10%">Reftype</th><th width="5%">DOI/URL</th></tr></thead>
+<tbody><tr id="babaeizadeh2016ga3c" class="entry">
+	<td>Babaeizadeh, M., Frosio, I., Tyree, S., Clemons, J. and Kautz, J.</td>
+	<td>GA3C: GPU-based A3C for deep reinforcement learning <p class="infolinks">[<a href="javascript:toggleInfo('babaeizadeh2016ga3c','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('babaeizadeh2016ga3c','comment')">Comment</a>] [<a href="javascript:toggleInfo('babaeizadeh2016ga3c','bibtex')">BibTeX</a>]</p></td>
+	<td>2016</td>
+	<td>CoRR abs/1611.06256&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://www.researchgate.net/profile/Iuri_Frosio2/publication/310610848_GA3C_GPU-based_A3C_for_Deep_Reinforcement_Learning/links/583c6c0b08ae502a85e3dbb9/GA3C-GPU-based-A3C-for-Deep-Reinforcement-Learning.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_babaeizadeh2016ga3c" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: We introduce and analyze the computational aspects of a hybrid CPU/GPU implementation of the Asynchronous Advantage Actor-Critic (A3C) algorithm, currently the state-of-the-art method in reinforcement learning for various gaming tasks. Our analysis concentrates on the critical aspects to leverage the GPU’s computational power, including the introduction of a system of queues and a dynamic scheduling strategy, potentially helpful for other asynchronous algorithms as well. We also show the potential for the use of larger DNN models on a GPU. Our TensorFlow implementation achieves a significant speed up compared to our CPU-only implementation, and it will be made publicly available to other researchers.</td>
+</tr>
+<tr id="rev_babaeizadeh2016ga3c" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: GPU based reinforcemetn learning. Citations - 35</td>
+</tr>
+<tr id="bib_babaeizadeh2016ga3c" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{babaeizadeh2016ga3c,
+  author = {Babaeizadeh, Mohammad and Frosio, Iuri and Tyree, Stephen and Clemons, Jason and Kautz, Jan},
+  title = {GA3C: GPU-based A3C for deep reinforcement learning},
+  journal = {CoRR abs/1611.06256},
+  year = {2016},
+  url = {https://www.researchgate.net/profile/Iuri_Frosio2/publication/310610848_GA3C_GPU-based_A3C_for_Deep_Reinforcement_Learning/links/583c6c0b08ae502a85e3dbb9/GA3C-GPU-based-A3C-for-Deep-Reinforcement-Learning.pdf}
+}
+</pre></td>
+</tr>
+<tr id="bao2017deep" class="entry">
+	<td>Bao, W., Yue, J. and Rao, Y.</td>
+	<td>A deep learning framework for financial time series using stacked autoencoders and long-short term memory <p class="infolinks">[<a href="javascript:toggleInfo('bao2017deep','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('bao2017deep','comment')">Comment</a>] [<a href="javascript:toggleInfo('bao2017deep','bibtex')">BibTeX</a>]</p></td>
+	<td>2017</td>
+	<td>PloS one<br/>Vol. 12(7), pp. e0180944&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0180944">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_bao2017deep" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: The application of deep learning approaches to finance has received a great deal of attention from both investors and researchers. This study presents a novel deep learning framework where wavelet transforms (WT), stacked autoencoders (SAEs) and long-short term memory (LSTM) are combined for stock price forecasting. The SAEs for hierarchically extracted deep features is introduced into stock price forecasting for the first time. The deep learning framework comprises three stages. First, the stock price time series is decomposed by WT to eliminate noise. Second, SAEs is applied to generate deep high-level features for predicting the stock price. Third, high-level denoising features are fed into LSTM to forecast the next day’s closing price. Six market indices and their corresponding index futures are chosen to examine the performance of the proposed model. Results show that the proposed model outperforms other similar models in both predictive accuracy and profitability performance.</td>
+</tr>
+<tr id="rev_bao2017deep" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Deep learning framework for Time series analysis. Citations - 323</td>
+</tr>
+<tr id="bib_bao2017deep" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{bao2017deep,
+  author = {Bao, Wei and Yue, Jun and Rao, Yulei},
+  title = {A deep learning framework for financial time series using stacked autoencoders and long-short term memory},
+  journal = {PloS one},
+  publisher = {Public Library of Science San Francisco, CA USA},
+  year = {2017},
+  volume = {12},
+  number = {7},
+  pages = {e0180944},
+  url = {https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0180944}
+}
+</pre></td>
+</tr>
+<tr id="box1968some" class="entry">
+	<td>Box, G.E. and Jenkins, G.M.</td>
+	<td>Some recent advances in forecasting and control <p class="infolinks">[<a href="javascript:toggleInfo('box1968some','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('box1968some','comment')">Comment</a>] [<a href="javascript:toggleInfo('box1968some','bibtex')">BibTeX</a>]</p></td>
+	<td>1968</td>
+	<td>Journal of the Royal Statistical Society. Series C (Applied Statistics)<br/>Vol. 17(2), pp. 91-109&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://www.jstor.org/stable/2985674">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_box1968some" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: A brief discussion of Statistical Quality Control Charting procedures is first presented with special reference to the relevance of the objectives and assumptions. An approach to the design of discrete feedforward and feedback control schemes, which are of great importance for example, in the chemical industry, is then given. This approach to control employs discrete stochastic and dynamic models discussed in Part I of this paper (Box and Jenkins, 1968) and has a close link with the forecasting problems discussed there. The control algorithms obtained are ideally suited to discrete digital computer control. However, for common simple situations the algorithms may be represented by suitable charts or nomograms which may be employed to obtain improved manual control. The paper ends with a discussion of a problem typical of that arising in the parts manufacturing industry. Here, attention must be given to the cost of making an adjustment to the machine as well as to the cost of being off target and to the stochastic nature of the disturbance. An example is given where the appropriate form of action is like that required by Roberts's modification of a Shewhart chart. However, the justification required to make such action appropriate is very different from that previously given.</td>
+</tr>
+<tr id="rev_box1968some" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Forecasting and control. CItations - 173</td>
+</tr>
+<tr id="bib_box1968some" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{box1968some,
+  author = {Box, George EP and Jenkins, Gwilym M},
+  title = {Some recent advances in forecasting and control},
+  journal = {Journal of the Royal Statistical Society. Series C (Applied Statistics)},
+  publisher = {JSTOR},
+  year = {1968},
+  volume = {17},
+  number = {2},
+  pages = {91--109},
+  url = {https://www.jstor.org/stable/2985674}
+}
+</pre></td>
+</tr>
+<tr id="cao2003support" class="entry">
+	<td>Cao, L.-J. and Tay, F.E.H.</td>
+	<td>Support vector machine with adaptive parameters in financial time series forecasting <p class="infolinks">[<a href="javascript:toggleInfo('cao2003support','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('cao2003support','comment')">Comment</a>] [<a href="javascript:toggleInfo('cao2003support','bibtex')">BibTeX</a>]</p></td>
+	<td>2003</td>
+	<td>IEEE Transactions on neural networks<br/>Vol. 14(6), pp. 1506-1518&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://c.mql5.com/forextsd/forum/35/caotay2003.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_cao2003support" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: A  novel  type  of  learning  machine  called  supportvector  machine  (SVM)  has  been  receiving  increasing  interest  inareas ranging from its original application in pattern recognitionto  other  applications  such  as  regression  estimation  due  to  itsremarkable  generalization  performance.  This  paper  deals  withthe   application   of   SVM   in   financial   time   series   forecasting.The  feasibility  of  applying  SVM  in  financial  forecasting  is  firstexamined by comparing it with the multilayer back-propagation(BP)  neural  network  and  the  regularized  radial  basis  function(RBF)  neural  network.  The  variability  in  performance  of  SVMwith respect to the free parameters is investigated experimentally.Adaptive  parameters  are  then  proposed  by  incorporating  thenonstationarity of financial time series into SVM. Five real futurescontracts collated from the Chicago Mercantile Market are used asthe data sets. The simulation shows that among the three methods,SVM outperforms the BP neural network in financial forecasting,and  there  are  comparable  generalization  performance  betweenSVM and the regularized RBF neural network. Furthermore, thefree parameters of SVM have a great effect on the generalizationperformance.  SVM  with  adaptive  parameters  can  both  achievehigher generalization performance and use fewer support vectorsthan the standard SVM in financial forecasting</td>
+</tr>
+<tr id="rev_cao2003support" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: SVM for financial time series forecasting. Citations - 1000</td>
+</tr>
+<tr id="bib_cao2003support" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{cao2003support,
+  author = {Cao, Li-Juan and Tay, Francis Eng Hock},
+  title = {Support vector machine with adaptive parameters in financial time series forecasting},
+  journal = {IEEE Transactions on neural networks},
+  publisher = {IEEE},
+  year = {2003},
+  volume = {14},
+  number = {6},
+  pages = {1506--1518},
+  url = {https://c.mql5.com/forextsd/forum/35/caotay2003.pdf}
+}
+</pre></td>
+</tr>
+<tr id="chung2014empirical" class="entry">
+	<td>Chung, J., Gulcehre, C., Cho, K. and Bengio, Y.</td>
+	<td>Empirical evaluation of gated recurrent neural networks on sequence modeling <p class="infolinks">[<a href="javascript:toggleInfo('chung2014empirical','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('chung2014empirical','comment')">Comment</a>] [<a href="javascript:toggleInfo('chung2014empirical','bibtex')">BibTeX</a>]</p></td>
+	<td>2014</td>
+	<td>arXiv preprint arXiv:1412.3555&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://arxiv.org/pdf/1412.3555.pdf?ref=hackernoon.com">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_chung2014empirical" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: In this paper we compare different types of recurrent units in recurrent neural net-works (RNNs).  Especially, we focus on more sophisticated units that implementa gating mechanism, such as a long short-term memory (LSTM) unit and a re-cently proposed gated recurrent unit (GRU). We evaluate these recurrent units onthe tasks of polyphonic music modeling and speech signal modeling.  Our exper-iments revealed that these advanced recurrent units are indeed better than moretraditional recurrent units such astanhunits. Also, we found GRU to be compa-rable to LSTM.</td>
+</tr>
+<tr id="rev_chung2014empirical" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: gated RNN. Citations - 5072</td>
+</tr>
+<tr id="bib_chung2014empirical" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{chung2014empirical,
+  author = {Chung, Junyoung and Gulcehre, Caglar and Cho, KyungHyun and Bengio, Yoshua},
+  title = {Empirical evaluation of gated recurrent neural networks on sequence modeling},
+  journal = {arXiv preprint arXiv:1412.3555},
+  year = {2014},
+  url = {https://arxiv.org/pdf/1412.3555.pdf?ref=hackernoon.com}
+}
+</pre></td>
+</tr>
+<tr id="das2013data" class="entry">
+	<td>Das, D. and Uddin, M.S.</td>
+	<td>Data mining and neural network techniques in stock market prediction: A methodological review <p class="infolinks">[<a href="javascript:toggleInfo('das2013data','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('das2013data','comment')">Comment</a>] [<a href="javascript:toggleInfo('das2013data','bibtex')">BibTeX</a>]</p></td>
+	<td>2013</td>
+	<td>International journal of artificial intelligence &amp; applications<br/>Vol. 4(1), pp. 117&nbsp;</td>
+	<td>article</td>
+	<td><a href="http://search.proquest.com/openview/d9d7c6deefa76f29f94a4a43d7e8e222/1.pdf?pq-origsite=gscholar&cbl=646378">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_das2013data" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Prediction in any field is a complicated, challenging and daunting process. Employing traditional methods may not ensure the reliability of the prediction. In this paper, we are reviewing the possibility of applying two well-known techniques neural network and data mining in stock market prediction. As neural network is able to extract useful information from a huge data set and data mining is also able to predict future trends and behaviors. Therefore, a combination of both these techniques could make the prediction much reliable.</td>
+</tr>
+<tr id="rev_das2013data" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Data mining and neural network in stock market. CItations - 21</td>
+</tr>
+<tr id="bib_das2013data" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{das2013data,
+  author = {Das, Debashish and Uddin, Mohammad Shorif},
+  title = {Data mining and neural network techniques in stock market prediction: A methodological review},
+  journal = {International journal of artificial intelligence &amp; applications},
+  publisher = {Academy &amp; Industry Research Collaboration Center (AIRCC)},
+  year = {2013},
+  volume = {4},
+  number = {1},
+  pages = {117},
+  url = {http://search.proquest.com/openview/d9d7c6deefa76f29f94a4a43d7e8e222/1.pdf?pq-origsite=gscholar&amp;cbl=646378}
+}
+</pre></td>
+</tr>
+<tr id="deng2016deep" class="entry">
+	<td>Deng, Y., Bao, F., Kong, Y., Ren, Z. and Dai, Q.</td>
+	<td>Deep direct reinforcement learning for financial signal representation and trading <p class="infolinks">[<a href="javascript:toggleInfo('deng2016deep','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('deng2016deep','comment')">Comment</a>] [<a href="javascript:toggleInfo('deng2016deep','bibtex')">BibTeX</a>]</p></td>
+	<td>2016</td>
+	<td>IEEE transactions on neural networks and learning systems<br/>Vol. 28(3), pp. 653-664&nbsp;</td>
+	<td>article</td>
+	<td><a href="http://cslt.riit.tsinghua.edu.cn/mediawiki/images/a/aa/07407387.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_deng2016deep" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Can  we  train  the  computer  to  beat  experiencedtraders  for  financial  assert  trading?  In  this  paper,  we  try  toaddress  this  challenge  by  introducing  a  recurrent  deep  neuralnetwork  (NN)  for  real-time  financial  signal  representation  andtrading. Our model is inspired by two biological-related learningconcepts of deep learning (DL) and reinforcement learning (RL).In the framework, the DL part automatically senses the dynamicmarket condition for informative feature learning. Then, the RLmodule  interacts  with  deep  representations  and  makes  tradingdecisions  to  accumulate  the  ultimate  rewards  in  an  unknownenvironment.  The  learning  system  is  implemented  in  a  complexNN that exhibits both the deep and recurrent structures. Hence,we propose a task-aware backpropagation through time methodto  cope  with  the  gradient  vanishing  issue  in  deep  training.  Therobustness of the neural system is verified on both the stock andthe commodity  future markets  under broad  testing conditions.</td>
+</tr>
+<tr id="rev_deng2016deep" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Reinforcment learning in financial signal. Citations - 252</td>
+</tr>
+<tr id="bib_deng2016deep" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{deng2016deep,
+  author = {Deng, Yue and Bao, Feng and Kong, Youyong and Ren, Zhiquan and Dai, Qionghai},
+  title = {Deep direct reinforcement learning for financial signal representation and trading},
+  journal = {IEEE transactions on neural networks and learning systems},
+  publisher = {IEEE},
+  year = {2016},
+  volume = {28},
+  number = {3},
+  pages = {653--664},
+  url = {http://cslt.riit.tsinghua.edu.cn/mediawiki/images/a/aa/07407387.pdf}
+}
+</pre></td>
+</tr>
+<tr id="ding2015deep" class="entry">
+	<td>Ding, X., Zhang, Y., Liu, T. and Duan, J.</td>
+	<td>Deep learning for event-driven stock prediction <p class="infolinks">[<a href="javascript:toggleInfo('ding2015deep','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('ding2015deep','comment')">Comment</a>] [<a href="javascript:toggleInfo('ding2015deep','bibtex')">BibTeX</a>]</p></td>
+	<td>2015</td>
+	<td>Twenty-fourth international joint conference on artificial intelligence&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.wins.or.kr/DataPool/Board/4xxxx/455xx/45587/329.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_ding2015deep" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: We propose a deep learning method for eventdriven stock market prediction. First, events are extracted from news text, and represented as dense vectors, trained using a novel neural tensor network. Second, a deep convolutional neural network is used to model both short-term and long-term influences of events on stock price movements. Experimental results show that our model can achieve nearly 6% improvements on S&amp;P 500 index prediction and individual stock prediction, respectively, compared to state-of-the-art baseline methods. In addition, market simulation results show that our system is more capable of making profits than previously reported systems trained on S&amp;P 500 stock historical data.</td>
+</tr>
+<tr id="rev_ding2015deep" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Deep learning for stock prediction. Citations - 378</td>
+</tr>
+<tr id="bib_ding2015deep" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{ding2015deep,
+  author = {Ding, Xiao and Zhang, Yue and Liu, Ting and Duan, Junwen},
+  title = {Deep learning for event-driven stock prediction},
+  booktitle = {Twenty-fourth international joint conference on artificial intelligence},
+  year = {2015},
+  url = {http://www.wins.or.kr/DataPool/Board/4xxxx/455xx/45587/329.pdf}
+}
+</pre></td>
+</tr>
+<tr id="duan1995garch" class="entry">
+	<td>Duan, J.-C.</td>
+	<td>The GARCH option pricing model <p class="infolinks">[<a href="javascript:toggleInfo('duan1995garch','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('duan1995garch','comment')">Comment</a>] [<a href="javascript:toggleInfo('duan1995garch','bibtex')">BibTeX</a>]</p></td>
+	<td>1995</td>
+	<td>Mathematical finance<br/>Vol. 5(1), pp. 13-32&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1467-9965.1995.tb00099.x">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_duan1995garch" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: This article develops an option pricing model and its corresponding delta formula in the context of the generalized autoregressive conditional heteroskedastic (GARCH) asset return process. the development utilizes the locally risk‐neutral valuation relationship (LRNVR). the LRNVR is shown to hold under certain combinations of preference and distribution assumptions. the GARCH option pricing model is capable of reflecting the changes in the conditional volatility of the underlying asset in a parsimonious manner. Numerical analyses suggest that the GARCH model may be able to explain some well‐documented systematic biases associated with the Black‐Scholes model.</td>
+</tr>
+<tr id="rev_duan1995garch" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: GARCH option. Citations - 1486</td>
+</tr>
+<tr id="bib_duan1995garch" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{duan1995garch,
+  author = {Duan, Jin-Chuan},
+  title = {The GARCH option pricing model},
+  journal = {Mathematical finance},
+  publisher = {Wiley Online Library},
+  year = {1995},
+  volume = {5},
+  number = {1},
+  pages = {13--32},
+  url = {https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1467-9965.1995.tb00099.x}
+}
+</pre></td>
+</tr>
+<tr id="fischer2018deep" class="entry">
+	<td>Fischer, T. and Krauss, C.</td>
+	<td>Deep learning with long short-term memory networks for financial market predictions <p class="infolinks">[<a href="javascript:toggleInfo('fischer2018deep','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('fischer2018deep','comment')">Comment</a>] [<a href="javascript:toggleInfo('fischer2018deep','bibtex')">BibTeX</a>]</p></td>
+	<td>2018</td>
+	<td>European Journal of Operational Research<br/>Vol. 270(2), pp. 654-669&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://www.econstor.eu/bitstream/10419/157808/1/886576210.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_fischer2018deep" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Long short-term memory (LSTM) networks are a state-of-the-art technique for sequence learning. They are less commonly applied to financial time series predictions, yet inherently suitable for this domain. We deploy LSTM networks for predicting out-of-sample directional movements for the constituent stocks of the S&amp;P 500 from 1992 until 2015. With daily returns of 0.46 percent and a Sharpe Ratio of 5.8 prior to transaction costs, we find LSTM networks to outperform memoryfree classification methods, i.e., a random forest (RAF), a deep neural net (DNN), and a logistic regression classifier (LOG). We unveil sources of profitability, thereby shedding light into the black box of artificial neural networks. Specifically, we find one common pattern among the stocks selected<br>for trading - they exhibit high volatility and a short-term reversal return profile. Leveraging these findings, we are able to formalize a rules-based short-term reversal strategy that is able to explain a portion of the returns of the LSTM.</td>
+</tr>
+<tr id="rev_fischer2018deep" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Deep learning with LSTM. Citations - 413</td>
+</tr>
+<tr id="bib_fischer2018deep" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{fischer2018deep,
+  author = {Fischer, Thomas and Krauss, Christopher},
+  title = {Deep learning with long short-term memory networks for financial market predictions},
+  journal = {European Journal of Operational Research},
+  publisher = {Elsevier},
+  year = {2018},
+  volume = {270},
+  number = {2},
+  pages = {654--669},
+  url = {https://www.econstor.eu/bitstream/10419/157808/1/886576210.pdf}
+}
+</pre></td>
+</tr>
+<tr id="graves2013speech" class="entry">
+	<td>Graves, A., Mohamed, A.-r. and Hinton, G.</td>
+	<td>Speech recognition with deep recurrent neural networks <p class="infolinks">[<a href="javascript:toggleInfo('graves2013speech','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('graves2013speech','comment')">Comment</a>] [<a href="javascript:toggleInfo('graves2013speech','bibtex')">BibTeX</a>]</p></td>
+	<td>2013</td>
+	<td>2013 IEEE international conference on acoustics, speech and signal processing, pp. 6645-6649&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="https://arxiv.org/pdf/1303.5778.pdf%C3%AF%C2%BC%E2%80%B0%C3%AF%C2%BC%C5%A1%E2%80%9C%C3%A5%C2%A6%E2%80%9A%C3%A6%C5%BE%C5%93LSTM%C3%A7%E2%80%9D%C2%A8%C3%A4%C2%BA%C5%BD%C3%A9%C5%A1%20%C3%A8%E2%80%94%20%C3%A5%C2%B1%E2%80%9A%C3%AF%C2%BC%C5%92%C3%A6%CB%86%E2%80%98%C3%A4%C2%BB%C2%AC%C3%A5%C2%B0%E2%80%A0%C3%A5%C2%BE%E2%80%94%C3%A5%CB%86%C2%B0">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_graves2013speech" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Recurrent neural networks (RNNs) are a powerful model forsequential data. End-to-end training methods such as Connec-tionist Temporal Classification make it possible to train RNNsfor sequence labelling problems where the input-output align-ment is unknown.   The combination of these methods withthe Long Short-term Memory RNN architecture has provedparticularly fruitful, delivering state-of-the-art results in cur-sive handwriting recognition. However RNN performance inspeech recognition has so far been disappointing, with betterresults returned by deep feedforward networks. This paper in-vestigatesdeep recurrent neural networks, which combine themultiple levels of representation that have proved so effectivein deep networks with the flexible use of long range contextthat  empowers  RNNs.   When  trained  end-to-end  with  suit-able regularisation, we find that deep Long Short-term Mem-ory  RNNs  achieve  a  test  set  error  of  17.7%  on  the  TIMITphoneme recognition benchmark, which to our knowledge isthe best recorded score.</td>
+</tr>
+<tr id="rev_graves2013speech" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Speech recognition using DRNN. Citations - 6139</td>
+</tr>
+<tr id="bib_graves2013speech" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{graves2013speech,
+  author = {Graves, Alex and Mohamed, Abdel-rahman and Hinton, Geoffrey},
+  title = {Speech recognition with deep recurrent neural networks},
+  booktitle = {2013 IEEE international conference on acoustics, speech and signal processing},
+  year = {2013},
+  pages = {6645--6649},
+  url = {https://arxiv.org/pdf/1303.5778.pdf%C3%AF%C2%BC%E2%80%B0%C3%AF%C2%BC%C5%A1%E2%80%9C%C3%A5%C2%A6%E2%80%9A%C3%A6%C5%BE%C5%93LSTM%C3%A7%E2%80%9D%C2%A8%C3%A4%C2%BA%C5%BD%C3%A9%C5%A1%20%C3%A8%E2%80%94%20%C3%A5%C2%B1%E2%80%9A%C3%AF%C2%BC%C5%92%C3%A6%CB%86%E2%80%98%C3%A4%C2%BB%C2%AC%C3%A5%C2%B0%E2%80%A0%C3%A5%C2%BE%E2%80%94%C3%A5%CB%86%C2%B0}
+}
+</pre></td>
+</tr>
+<tr id="hendershott2009algorithmic" class="entry">
+	<td>Hendershott, T., Riordan, R. and others</td>
+	<td>Algorithmic trading and information <p class="infolinks">[<a href="javascript:toggleInfo('hendershott2009algorithmic','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('hendershott2009algorithmic','comment')">Comment</a>] [<a href="javascript:toggleInfo('hendershott2009algorithmic','bibtex')">BibTeX</a>]</p></td>
+	<td>2009</td>
+	<td>Manuscript, University of California, Berkeley&nbsp;</td>
+	<td>article</td>
+	<td><a href="http://www.academia.edu/download/41530807/Into_the_Breech_The_Increasing_Gap_betwe20160124-6877-1n8lopr.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_hendershott2009algorithmic" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: We examine algorithmic trades (AT) and their role in the price discovery process in the 30DAX stocks on the Deutsche Boerse in January 2008.  AT liquidity demand represents 52% ofvolume and AT supplies liquidity on 50% of volume.  AT act strategically by monitoring themarket for liquidity and deviations of price from fundamental value.  AT consume liquidity whenit is cheap and supply liquidity when it is expensive.  AT contribute more to the efficient priceby placing more efficient quotes and AT demanding liquidity to move the prices towards theefficient price.</td>
+</tr>
+<tr id="rev_hendershott2009algorithmic" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Algorithmic trading. CItations - 268</td>
+</tr>
+<tr id="bib_hendershott2009algorithmic" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{hendershott2009algorithmic,
+  author = {Hendershott, Terrence and Riordan, Ryan and others},
+  title = {Algorithmic trading and information},
+  journal = {Manuscript, University of California, Berkeley},
+  year = {2009},
+  url = {http://www.academia.edu/download/41530807/Into_the_Breech_The_Increasing_Gap_betwe20160124-6877-1n8lopr.pdf}
+}
+</pre></td>
+</tr>
+<tr id="hendershott2011does" class="entry">
+	<td>Hendershott, T., Jones, C.M. and Menkveld, A.J.</td>
+	<td>Does algorithmic trading improve liquidity? <p class="infolinks">[<a href="javascript:toggleInfo('hendershott2011does','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('hendershott2011does','comment')">Comment</a>] [<a href="javascript:toggleInfo('hendershott2011does','bibtex')">BibTeX</a>]</p></td>
+	<td>2011</td>
+	<td>The Journal of finance<br/>Vol. 66(1), pp. 1-33&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1540-6261.2010.01624.x">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_hendershott2011does" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Algorithmic trading (AT) has increased sharply over the past decade. Does it improve market quality, and should it be encouraged? We provide the first analysis of this question. The New York Stock Exchange automated quote dissemination in 2003, and we use this change in market structure that increases AT as an exogenous instrument to measure the causal effect of AT on liquidity. For large stocks in particular, AT narrows spreads, reduces adverse selection, and reduces trade‐related price discovery. The findings indicate that AT improves liquidity and enhances the informativeness of quotes.</td>
+</tr>
+<tr id="rev_hendershott2011does" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Algorithmic trading in liquidity. CItations - 1496</td>
+</tr>
+<tr id="bib_hendershott2011does" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{hendershott2011does,
+  author = {Hendershott, Terrence and Jones, Charles M and Menkveld, Albert J},
+  title = {Does algorithmic trading improve liquidity?},
+  journal = {The Journal of finance},
+  publisher = {Wiley Online Library},
+  year = {2011},
+  volume = {66},
+  number = {1},
+  pages = {1--33},
+  url = {https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1540-6261.2010.01624.x}
+}
+</pre></td>
+</tr>
+<tr id="hinton2012deep" class="entry">
+	<td>Hinton, G., Deng, L., Yu, D., Dahl, G.E., Mohamed, A.-r., Jaitly, N., Senior, A., Vanhoucke, V., Nguyen, P., Sainath, T.N. and others</td>
+	<td>Deep neural networks for acoustic modeling in speech recognition: The shared views of four research groups <p class="infolinks">[<a href="javascript:toggleInfo('hinton2012deep','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('hinton2012deep','comment')">Comment</a>] [<a href="javascript:toggleInfo('hinton2012deep','bibtex')">BibTeX</a>]</p></td>
+	<td>2012</td>
+	<td>IEEE Signal processing magazine<br/>Vol. 29(6), pp. 82-97&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/HintonDengYuEtAl-SPM2012.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_hinton2012deep" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Most  current  speech  recognition  systems  use  hidden  Markov  models  (HMMs)  to  deal  with  the  temporal  variability  of  speech  and  Gaussian  mixture  models  (GMMs)  to  deter-mine how well each state of each HMM fits a frame  or  a  short  window  of  frames  of  coefficients  that  repre-sents the acoustic input. An alternative way to evaluate the fit is  to  use  a  feed-forward  neural  network  that  takes  several  frames  of  coefficients  as  input  and  produces  posterior  proba-bilities  over  HMM  states  as  output.  Deep  neural  networks  (DNNs)  that  have  many  hidden  layers  and  are  trained  using  new methods have been shown to outperform GMMs on a vari-ety  of  speech  recognition  benchmarks,  sometimes  by  a  large  margin. This article provides an overview of this progress and represents the shared views of four research groups that have had  recent  successes  in  using  DNNs  for  acoustic  modeling  in  speech recognition</td>
+</tr>
+<tr id="rev_hinton2012deep" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: DNN for speech. Citations - 8210</td>
+</tr>
+<tr id="bib_hinton2012deep" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{hinton2012deep,
+  author = {Hinton, Geoffrey and Deng, Li and Yu, Dong and Dahl, George E and Mohamed, Abdel-rahman and Jaitly, Navdeep and Senior, Andrew and Vanhoucke, Vincent and Nguyen, Patrick and Sainath, Tara N and others},
+  title = {Deep neural networks for acoustic modeling in speech recognition: The shared views of four research groups},
+  journal = {IEEE Signal processing magazine},
+  publisher = {IEEE},
+  year = {2012},
+  volume = {29},
+  number = {6},
+  pages = {82--97},
+  url = {https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/HintonDengYuEtAl-SPM2012.pdf}
+}
+</pre></td>
+</tr>
+<tr id="hochreiter1997long" class="entry">
+	<td>Hochreiter, S. and Schmidhuber, J.</td>
+	<td>Long short-term memory <p class="infolinks">[<a href="javascript:toggleInfo('hochreiter1997long','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('hochreiter1997long','comment')">Comment</a>] [<a href="javascript:toggleInfo('hochreiter1997long','bibtex')">BibTeX</a>]</p></td>
+	<td>1997</td>
+	<td>Neural computation<br/>Vol. 9(8), pp. 1735-1780&nbsp;</td>
+	<td>article</td>
+	<td><a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.676.4320&rep=rep1&type=pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_hochreiter1997long" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Learning to store information over extended time intervals by recurrent backpropagation takes a very long time, mostly because of insufficient, decaying error backflow. We briefly review Hochreiter's (1991) analysis of this problem, then address it by introducing a novel, efficient, gradient based method called long short-term memory (LSTM). Truncating the gradient where this does not do harm, LSTM can learn to bridge minimal time lags in excess of 1000 discrete-time steps by enforcing constant error flow through constant error carousels within special units. Multiplicative gate units learn to open and close access to the constant error flow. LSTM is local in space and time; its computational complexity per time step and weight is O. 1. Our experiments with artificial data involve local, distributed, real-valued, and noisy pattern representations. In comparisons with real-time recurrent learning, back propagation through time, recurrent cascade correlation, Elman nets, and neural sequence chunking, LSTM leads to many more successful runs, and learns much faster. LSTM also solves complex, artificial long-time-lag tasks that have never been solved by previous recurrent network algorithms.</td>
+</tr>
+<tr id="rev_hochreiter1997long" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: LSTM. CItations - 35943</td>
+</tr>
+<tr id="bib_hochreiter1997long" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{hochreiter1997long,
+  author = {Hochreiter, Sepp and Schmidhuber, J&uuml;rgen},
+  title = {Long short-term memory},
+  journal = {Neural computation},
+  publisher = {MIT Press},
+  year = {1997},
+  volume = {9},
+  number = {8},
+  pages = {1735--1780},
+  url = {http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.676.4320&amp;rep=rep1&amp;type=pdf}
+}
+</pre></td>
+</tr>
+<tr id="jin2016portfolio" class="entry">
+	<td>Jin, O. and El-Saawy, H.</td>
+	<td>Portfolio management using reinforcement learning <p class="infolinks">[<a href="javascript:toggleInfo('jin2016portfolio','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('jin2016portfolio','comment')">Comment</a>] [<a href="javascript:toggleInfo('jin2016portfolio','bibtex')">BibTeX</a>]</p></td>
+	<td>2016</td>
+	<td>Stanford University&nbsp;</td>
+	<td>article</td>
+	<td><a href="http://cs229.stanford.edu/proj2016/report/JinElSaawy-PortfolioManagementusingReinforcementLearning-report.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_jin2016portfolio" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: In this project, we use deep Q-learning to train a neural network to manage a stock portfolio of two stocks. In most cases the neural networks performed on par with benchmarks, although some models did significantly better according in terms of raw returns.</td>
+</tr>
+<tr id="rev_jin2016portfolio" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Portfolio managemetn. Citations - 7</td>
+</tr>
+<tr id="bib_jin2016portfolio" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{jin2016portfolio,
+  author = {Jin, Olivier and El-Saawy, Hamza},
+  title = {Portfolio management using reinforcement learning},
+  journal = {Stanford University},
+  year = {2016},
+  url = {http://cs229.stanford.edu/proj2016/report/JinElSaawy-PortfolioManagementusingReinforcementLearning-report.pdf}
+}
+</pre></td>
+</tr>
+<tr id="kakade2002approximately" class="entry">
+	<td>Kakade, S. and Langford, J.</td>
+	<td>Approximately optimal approximate reinforcement learning <p class="infolinks">[<a href="javascript:toggleInfo('kakade2002approximately','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('kakade2002approximately','comment')">Comment</a>] [<a href="javascript:toggleInfo('kakade2002approximately','bibtex')">BibTeX</a>]</p></td>
+	<td>2002</td>
+	<td><br/>Vol. 2ICML, pp. 267-274&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="https://www.cs.cmu.edu/~./jcl/papers/aoarl/Final.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_kakade2002approximately" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: In order to solve realistic reinforcement learning problems, it is critical that approximate algorithms be used. In this paper, we present the conservative policy iteration algorithm which finds an" approximately" optimal policy, given access to a restart distribution (which draws the next state from a particular distribution) and an approximate greedy policy chooser. Crudely, the greedy policy chooser outputs a policy that usually chooses actions<br>with the largest state-action values of the current policy, ie it outputs an" approximate".</td>
+</tr>
+<tr id="rev_kakade2002approximately" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Reinforcement learning. Citations - 422</td>
+</tr>
+<tr id="bib_kakade2002approximately" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{kakade2002approximately,
+  author = {Kakade, Sham and Langford, John},
+  title = {Approximately optimal approximate reinforcement learning},
+  booktitle = {ICML},
+  year = {2002},
+  volume = {2},
+  pages = {267--274},
+  url = {https://www.cs.cmu.edu/&nbsp;./jcl/papers/aoarl/Final.pdf}
+}
+</pre></td>
+</tr>
+<tr id="kercheval2015modelling" class="entry">
+	<td>Kercheval, A.N. and Zhang, Y.</td>
+	<td>Modelling high-frequency limit order book dynamics with support vector machines <p class="infolinks">[<a href="javascript:toggleInfo('kercheval2015modelling','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('kercheval2015modelling','comment')">Comment</a>] [<a href="javascript:toggleInfo('kercheval2015modelling','bibtex')">BibTeX</a>]</p></td>
+	<td>2015</td>
+	<td>Quantitative Finance<br/>Vol. 15(8), pp. 1315-1329&nbsp;</td>
+	<td>article</td>
+	<td><a href="http://www.smallake.kr/wp-content/uploads/2015/09/paper462.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_kercheval2015modelling" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: We propose a machine learning framework to capture the dynamics of high-frequency limit order books in financial equity markets and automate real-timeprediction of metrics such as mid-price movement and price spread crossing.  Bycharacterizing each entry in a limit order book with a vector of attributes such asprice and volume at different levels, the proposed framework builds a learningmodel  for  each  metric  with  the  help  of  multi-class  support  vector  machines(SVMs).   Experiments  with  real  data  establish  that  features  selected  by  theproposed framework are effective for short term price movement forecasts.</td>
+</tr>
+<tr id="rev_kercheval2015modelling" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: High frequency limit order using SVM. Citations - 87</td>
+</tr>
+<tr id="bib_kercheval2015modelling" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{kercheval2015modelling,
+  author = {Kercheval, Alec N and Zhang, Yuan},
+  title = {Modelling high-frequency limit order book dynamics with support vector machines},
+  journal = {Quantitative Finance},
+  publisher = {Taylor &amp; Francis},
+  year = {2015},
+  volume = {15},
+  number = {8},
+  pages = {1315--1329},
+  url = {http://www.smallake.kr/wp-content/uploads/2015/09/paper462.pdf}
+}
+</pre></td>
+</tr>
+<tr id="khaidem2016predicting" class="entry">
+	<td>Khaidem, L., Saha, S. and Dey, S.R.</td>
+	<td>Predicting the direction of stock market prices using random forest <p class="infolinks">[<a href="javascript:toggleInfo('khaidem2016predicting','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('khaidem2016predicting','comment')">Comment</a>] [<a href="javascript:toggleInfo('khaidem2016predicting','bibtex')">BibTeX</a>]</p></td>
+	<td>2016</td>
+	<td>arXiv preprint arXiv:1605.00003&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://arxiv.org/pdf/1605.00003">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_khaidem2016predicting" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Predicting trends in stock market prices has been an area of interest for researchers for many years due to its complex and dynamic nature. Intrinsic volatility in stock market across the globe makes the task of prediction challenging. Forecasting and diffusion modeling, although effective can't be the panacea to the diverse range of problems encountered in prediction, short-term or otherwise. Market risk, strongly correlated with forecasting errors, needs to be minimized to ensure minimal risk in investment. The authors propose to minimize forecasting error by treating the forecasting problem as a classification problem, a popular suite of algorithms in Machine learning. In this paper, we propose a novel way to minimize the risk of investment in stock market by predicting the returns of a stock using a class of powerful machine learning algorithms known as ensemble learning. Some of the technical indicators such as Relative Strength Index (RSI), stochastic oscillator etc are used as inputs to train our model. The learning model used is an ensemble of multiple decision trees. The algorithm is shown to outperform existing algo- rithms found in the literature. Out of Bag (OOB) error estimates have been found to be encouraging. Key Words: Random Forest Classifier, stock price forecasting, Exponential smoothing, feature extraction, OOB error and convergence.</td>
+</tr>
+<tr id="rev_khaidem2016predicting" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Stock market prediction using random forest. Citations - 112</td>
+</tr>
+<tr id="bib_khaidem2016predicting" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{khaidem2016predicting,
+  author = {Khaidem, Luckyson and Saha, Snehanshu and Dey, Sudeepa Roy},
+  title = {Predicting the direction of stock market prices using random forest},
+  journal = {arXiv preprint arXiv:1605.00003},
+  year = {2016},
+  url = {https://arxiv.org/pdf/1605.00003}
+}
+</pre></td>
+</tr>
+<tr id="lei2020time" class="entry">
+	<td>Lei, K., Zhang, B., Li, Y., Yang, M. and Shen, Y.</td>
+	<td>Time-driven feature-aware jointly deep reinforcement learning for financial signal representation and algorithmic trading <p class="infolinks">[<a href="javascript:toggleInfo('lei2020time','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('lei2020time','comment')">Comment</a>] [<a href="javascript:toggleInfo('lei2020time','bibtex')">BibTeX</a>]</p></td>
+	<td>2020</td>
+	<td>Expert Systems with Applications<br/>Vol. 140, pp. 112872&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://ieeexplore.ieee.org/iel7/6287639/8600701/08786132.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_lei2020time" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: In algorithmic trading, feature extraction and trading strategy design are two prominentchallenges to acquire long-term profits. However, the previously proposed methods rely heavily on domainknowledge to extract handcrafted features and lack an effective way to dynamically adjust the tradingstrategy. With the recent breakthroughs of deep reinforcement learning (DRL), sequential real-worldproblems can be modeled and solved with a more human-like approach. In this paper, we propose anovel trading agent, based on deep reinforcement learning, to autonomously make trading decisions andgain profits in the dynamic financial markets. We extend the value-based deep Q-network (DQN) and theasynchronous advantage actor-critic (A3C) for better adapting to the trading market. Specifically, in orderto automatically extract robust market representations and resolve the financial time series dependence,we utilize the stacked denoising autoencoders (SDAEs) and the long short-term memory (LSTM) as parts ofthe function approximator, respectively. Furthermore, we design several elaborate mechanisms to make thetrading agent more practical to the real trading environment, such as position-controlled action and n-stepreward. The experimental results show that our trading agent outperforms the baselines and achieves stablerisk-adjusted returns in both the stock and the futures markets.</td>
+</tr>
+<tr id="rev_lei2020time" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Reinforcement learning. Citations - 8</td>
+</tr>
+<tr id="bib_lei2020time" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{lei2020time,
+  author = {Lei, Kai and Zhang, Bing and Li, Yu and Yang, Min and Shen, Ying},
+  title = {Time-driven feature-aware jointly deep reinforcement learning for financial signal representation and algorithmic trading},
+  journal = {Expert Systems with Applications},
+  publisher = {Elsevier},
+  year = {2020},
+  volume = {140},
+  pages = {112872},
+  url = {https://ieeexplore.ieee.org/iel7/6287639/8600701/08786132.pdf}
+}
+</pre></td>
+</tr>
+<tr id="matiisen2019teacher" class="entry">
+	<td>Matiisen, T., Oliver, A., Cohen, T. and Schulman, J.</td>
+	<td>Teacher-student curriculum learning <p class="infolinks">[<a href="javascript:toggleInfo('matiisen2019teacher','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('matiisen2019teacher','comment')">Comment</a>] [<a href="javascript:toggleInfo('matiisen2019teacher','bibtex')">BibTeX</a>]</p></td>
+	<td>2019</td>
+	<td>IEEE transactions on neural networks and learning systems&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://arxiv.org/pdf/1707.00183">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_matiisen2019teacher" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: We propose Teacher-Student Curriculum Learning (TSCL), a framework for automatic curriculum learning, where the Student tries to learn a complex task and the Teacher automatically chooses subtasks from a given set for the Student to train on. We describe a family of Teacher algorithms that rely on the intuition that the Student should practice more those tasks on which it makes the fastest progress, i.e. where the slope of the learning curve is highest. In addition, the Teacher algorithms address the problem of forgetting by also choosing tasks where the Student’s performance is getting worse. We demonstrate that TSCL matches or surpasses the results of carefully hand-crafted curricula in two tasks: addition of decimal numbers with LSTM and navigation in Minecraft. Using our automatically generated curriculum enabled to solve a Minecraft maze that could not be solved at all when training directly on solving the maze, and the learning was an order of magnitude faster than uniform sampling of subtasks.</td>
+</tr>
+<tr id="rev_matiisen2019teacher" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Reinforcement learning. Citations - 86</td>
+</tr>
+<tr id="bib_matiisen2019teacher" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{matiisen2019teacher,
+  author = {Matiisen, Tambet and Oliver, Avital and Cohen, Taco and Schulman, John},
+  title = {Teacher-student curriculum learning},
+  journal = {IEEE transactions on neural networks and learning systems},
+  publisher = {IEEE},
+  year = {2019},
+  url = {https://arxiv.org/pdf/1707.00183}
+}
+</pre></td>
+</tr>
+<tr id="mnih2015human" class="entry">
+	<td>Mnih, V., Kavukcuoglu, K., Silver, D., Rusu, A.A., Veness, J., Bellemare, M.G., Graves, A., Riedmiller, M., Fidjeland, A.K., Ostrovski, G. and others</td>
+	<td>Human-level control through deep reinforcement learning <p class="infolinks">[<a href="javascript:toggleInfo('mnih2015human','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('mnih2015human','comment')">Comment</a>] [<a href="javascript:toggleInfo('mnih2015human','bibtex')">BibTeX</a>]</p></td>
+	<td>2015</td>
+	<td>nature<br/>Vol. 518(7540), pp. 529-533&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://daiwk.github.io/assets/dqn.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_mnih2015human" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: The theory of reinforcement learning provides a normative account1, deeply rooted in psychological2 and neuroscientific3 perspectives on animal behaviour, of how agents may optimize their control of an environment. To use reinforcement learning successfully in situations approaching real-world complexity, however, agents are confronted with a difficult task: they must derive efficient representations of the environment from high-dimensional sensory inputs, and use these to generalize past experience to new situations. Remarkably, humans and other animals seem to solve this problem through a harmonious combination of reinforcement learning and hierarchical sensory processing systems4,5, the former evidenced by a wealth of neural data revealing notable parallels between the phasic signals emitted by dopaminergic neurons and temporal difference reinforcement learning algorithms3. While reinforcement learning agents have achieved some successes in a variety of domains6,7,8, their applicability has previously been limited to domains in which useful features can be handcrafted, or to domains with fully observed, low-dimensional state spaces. Here we use recent advances in training deep neural networks9,10,11 to develop a novel artificial agent, termed a deep Q-network, that can learn successful policies directly from high-dimensional sensory inputs using end-to-end reinforcement learning. We tested this agent on the challenging domain of classic Atari 2600 games12. We demonstrate that the deep Q-network agent, receiving only the pixels and the game score as inputs, was able to surpass the performance of all previous algorithms and achieve a level comparable to that of a professional human games tester across a set of 49 games, using the same algorithm, network architecture and hyperparameters. This work bridges the divide between high-dimensional sensory inputs and actions, resulting in the first artificial agent that is capable of learning to excel at a diverse array of challenging tasks.</td>
+</tr>
+<tr id="rev_mnih2015human" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Deep reinforcement learning. Citations - 11182</td>
+</tr>
+<tr id="bib_mnih2015human" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{mnih2015human,
+  author = {Mnih, Volodymyr and Kavukcuoglu, Koray and Silver, David and Rusu, Andrei A and Veness, Joel and Bellemare, Marc G and Graves, Alex and Riedmiller, Martin and Fidjeland, Andreas K and Ostrovski, Georg and others},
+  title = {Human-level control through deep reinforcement learning},
+  journal = {nature},
+  publisher = {Nature Publishing Group},
+  year = {2015},
+  volume = {518},
+  number = {7540},
+  pages = {529--533},
+  url = {https://daiwk.github.io/assets/dqn.pdf}
+}
+</pre></td>
+</tr>
+<tr id="mnih2016asynchronous" class="entry">
+	<td>Mnih, V., Badia, A.P., Mirza, M., Graves, A., Lillicrap, T., Harley, T., Silver, D. and Kavukcuoglu, K.</td>
+	<td>Asynchronous methods for deep reinforcement learning <p class="infolinks">[<a href="javascript:toggleInfo('mnih2016asynchronous','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('mnih2016asynchronous','comment')">Comment</a>] [<a href="javascript:toggleInfo('mnih2016asynchronous','bibtex')">BibTeX</a>]</p></td>
+	<td>2016</td>
+	<td>International conference on machine learning, pp. 1928-1937&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://www.jmlr.org/proceedings/papers/v48/mniha16.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_mnih2016asynchronous" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: We propose a conceptually simpleandlightweight    framework    for    deep    reinforce-ment  learning  that  uses  asynchronous  gradientdescent for optimization of deep neural networkcontrollers. We present asynchronous variants offour standard reinforcement learning algorithmsand  show  that  parallel  actor-learners  have  astabilizing  effect  on  training  allowing  all  fourmethods  to  successfully  train  neural  networkcontrollers.The  best  performing  method,  anasynchronous  variant  of  actor-critic,  surpassesthe current state-of-the-art on the Atari domainwhile  training  for  half  the  time  on  a  singlemulti-core CPU instead of a GPU. Furthermore,we show that asynchronous actor-critic succeedson  a  wide  variety  of  continuous  motor  controlproblems as well as on a new task of navigatingrandom 3D mazes using a visual input.</td>
+</tr>
+<tr id="rev_mnih2016asynchronous" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: DRL. CItations - 3646</td>
+</tr>
+<tr id="bib_mnih2016asynchronous" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{mnih2016asynchronous,
+  author = {Mnih, Volodymyr and Badia, Adria Puigdomenech and Mirza, Mehdi and Graves, Alex and Lillicrap, Timothy and Harley, Tim and Silver, David and Kavukcuoglu, Koray},
+  title = {Asynchronous methods for deep reinforcement learning},
+  booktitle = {International conference on machine learning},
+  year = {2016},
+  pages = {1928--1937},
+  url = {http://www.jmlr.org/proceedings/papers/v48/mniha16.pdf}
+}
+</pre></td>
+</tr>
+<tr id="neely2014forecasting" class="entry">
+	<td>Neely, C.J., Rapach, D.E., Tu, J. and Zhou, G.</td>
+	<td>Forecasting the equity risk premium: the role of technical indicators <p class="infolinks">[<a href="javascript:toggleInfo('neely2014forecasting','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('neely2014forecasting','comment')">Comment</a>] [<a href="javascript:toggleInfo('neely2014forecasting','bibtex')">BibTeX</a>]</p></td>
+	<td>2014</td>
+	<td>Management science<br/>Vol. 60(7), pp. 1772-1791&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=4062&context=lkcsb_research">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_neely2014forecasting" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Academic research relies extensively on macroeconomic variables to forecast the U.S. equity riskpremium, with relatively little attention paid to the technical indicators widely employed by practitioners.Our paper fills this gap by comparing the forecasting ability of technical indicators with that of macroe-conomic variables. Technical indicators display statistically and economically significant in-sample andout-of-sample forecasting power, matching or exceeding that of macroeconomic variables. Furthermore,technical indicators and macroeconomic variables provide complementary information over the businesscycle: technical indicators better detect the typical decline in the equity risk premium near business-cyclepeaks, while macroeconomic variables more readily pick up the typical rise in the equity risk premiumnear cyclical troughs.  Consistent with this behavior, we show that combining information from bothtechnical indicators and macroeconomic variables significantly improves equity risk premium forecastsversus using either type of information alone.  Overall,  the substantial countercyclical fluctuations inthe equity risk premium appear well captured by the combined information in technical indicators andmacroeconomic variables.</td>
+</tr>
+<tr id="rev_neely2014forecasting" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Forecasting. Citations - 476</td>
+</tr>
+<tr id="bib_neely2014forecasting" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{neely2014forecasting,
+  author = {Neely, Christopher J and Rapach, David E and Tu, Jun and Zhou, Guofu},
+  title = {Forecasting the equity risk premium: the role of technical indicators},
+  journal = {Management science},
+  publisher = {INFORMS},
+  year = {2014},
+  volume = {60},
+  number = {7},
+  pages = {1772--1791},
+  url = {https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=4062&amp;context=lkcsb_research}
+}
+</pre></td>
+</tr>
+<tr id="nuij2013automated" class="entry">
+	<td>Nuij, W., Milea, V., Hogenboom, F., Frasincar, F. and Kaymak, U.</td>
+	<td>An automated framework for incorporating news into stock trading strategies <p class="infolinks">[<a href="javascript:toggleInfo('nuij2013automated','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('nuij2013automated','comment')">Comment</a>] [<a href="javascript:toggleInfo('nuij2013automated','bibtex')">BibTeX</a>]</p></td>
+	<td>2013</td>
+	<td>IEEE transactions on knowledge and data engineering<br/>Vol. 26(4), pp. 823-835&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://personal.eur.nl/frasincar/papers/TKDE2014/tkde2014.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_nuij2013automated" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: —In this paper we present a framework for automatic exploitation of news in stock trading strategies. Events are extracted from news messages presented in free text without annotations. We test the introduced framework by deriving trading strategies based on technical indicators and impacts of the extracted events. The strategies take the form of rules that combine technical trading indicators with a news variable, and are revealed through the use of genetic programming. We find that the news variable is often included in the optimal trading rules, indicating the added value of news for predictive purposes and validating our proposed framework for automatically incorporating news in stock trading strategies.</td>
+</tr>
+<tr id="rev_nuij2013automated" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Incorporate stock into stock trading. CItations - 60</td>
+</tr>
+<tr id="bib_nuij2013automated" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{nuij2013automated,
+  author = {Nuij, Wijnand and Milea, Viorel and Hogenboom, Frederik and Frasincar, Flavius and Kaymak, Uzay},
+  title = {An automated framework for incorporating news into stock trading strategies},
+  journal = {IEEE transactions on knowledge and data engineering},
+  publisher = {IEEE},
+  year = {2013},
+  volume = {26},
+  number = {4},
+  pages = {823--835},
+  url = {https://personal.eur.nl/frasincar/papers/TKDE2014/tkde2014.pdf}
+}
+</pre></td>
+</tr>
+<tr id="said1984testing" class="entry">
+	<td>Said, S.E. and Dickey, D.A.</td>
+	<td>Testing for unit roots in autoregressive-moving average models of unknown order <p class="infolinks">[<a href="javascript:toggleInfo('said1984testing','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('said1984testing','comment')">Comment</a>] [<a href="javascript:toggleInfo('said1984testing','bibtex')">BibTeX</a>]</p></td>
+	<td>1984</td>
+	<td>Biometrika<br/>Vol. 71(3), pp. 599-607&nbsp;</td>
+	<td>article</td>
+	<td><a href="http://www.ssc.wisc.edu/~bhansen/718/SaidDickey1984.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_said1984testing" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Recently, methods for detecting unit roots in autoregressive and autoregressive-moving average time series have been proposed. The presence of a unit root indicates that the time series is not stationary but that differencing will reduce it to stationarity. The tests proposed to date require specification of the number of autoregressive and moving average coefficients in the model. In this paper we develop a test for unit roots which is based on an approximation of an autoregressive-moving average model by an autoregression.</td>
+</tr>
+<tr id="rev_said1984testing" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Autoregressive moving average model. CItations - 3889</td>
+</tr>
+<tr id="bib_said1984testing" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{said1984testing,
+  author = {Said, Said E and Dickey, David A},
+  title = {Testing for unit roots in autoregressive-moving average models of unknown order},
+  journal = {Biometrika},
+  publisher = {Oxford University Press},
+  year = {1984},
+  volume = {71},
+  number = {3},
+  pages = {599--607},
+  url = {http://www.ssc.wisc.edu/&nbsp;bhansen/718/SaidDickey1984.pdf}
+}
+</pre></td>
+</tr>
+<tr id="samek2013time" class="entry">
+	<td>Samek, D. and Varacha, P.</td>
+	<td>Time series prediction using artificial neural networks: single and multi-dimensional data <p class="infolinks">[<a href="javascript:toggleInfo('samek2013time','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('samek2013time','comment')">Comment</a>] [<a href="javascript:toggleInfo('samek2013time','bibtex')">BibTeX</a>]</p></td>
+	<td>2013</td>
+	<td>International Journal of Mathematical Models and Methods in Applied Sciences<br/>Vol. 7(1), pp. 38-46&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://pdfs.semanticscholar.org/a4e9/02f7b7b6bf7a740620aff5c896018bf6b103.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_samek2013time" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: The  paper  studies  time  series  prediction  using artificial  neural  networks.  The  special  attention  is  paid  to  the influence  of  size  of  the  input  vector  length.  Furthermore,  the prediction  of  standard  single-dimensional  data  signal  and  the prediction of multi-dimensional data signal are compared. The tested artificial  networks  are  as  follows:  multilayer  feed-forward  neural network,  recurrent  Elman  neural network, adaptive linear network and radial basis function neural network.</td>
+</tr>
+<tr id="rev_samek2013time" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Time series prediction using ANN. CItations - 7</td>
+</tr>
+<tr id="bib_samek2013time" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{samek2013time,
+  author = {Samek, David and Varacha, Pavel},
+  title = {Time series prediction using artificial neural networks: single and multi-dimensional data},
+  journal = {International Journal of Mathematical Models and Methods in Applied Sciences},
+  publisher = {North Atlantic University Union (NAUN)},
+  year = {2013},
+  volume = {7},
+  number = {1},
+  pages = {38--46},
+  url = {https://pdfs.semanticscholar.org/a4e9/02f7b7b6bf7a740620aff5c896018bf6b103.pdf}
+}
+</pre></td>
+</tr>
+<tr id="schaul2015prioritized" class="entry">
+	<td>Schaul, T., Quan, J., Antonoglou, I. and Silver, D.</td>
+	<td>Prioritized experience replay <p class="infolinks">[<a href="javascript:toggleInfo('schaul2015prioritized','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('schaul2015prioritized','comment')">Comment</a>] [<a href="javascript:toggleInfo('schaul2015prioritized','bibtex')">BibTeX</a>]</p></td>
+	<td>2015</td>
+	<td>arXiv preprint arXiv:1511.05952&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://arxiv.org/pdf/1511.05952">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_schaul2015prioritized" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Experience replay lets online reinforcement learning agents remember and reuseexperiences from the past.  In prior work, experience transitions were uniformlysampled from a replay memory. However, this approach simply replays transitionsat the same frequency that they were originally experienced, regardless of theirsignificance.  In this paper we develop a framework for prioritizing experience,so as to replay important transitions more frequently,  and therefore learn moreefficiently.  We use prioritized experience replay in Deep Q-Networks (DQN), areinforcement learning algorithm that achieved human-level performance acrossmany Atari games. DQN with prioritized experience replay achieves a new state-of-the-art, outperforming DQN with uniform replay on 41 out of 49 games.</td>
+</tr>
+<tr id="rev_schaul2015prioritized" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Learning from experience. CItations - 1432</td>
+</tr>
+<tr id="bib_schaul2015prioritized" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{schaul2015prioritized,
+  author = {Schaul, Tom and Quan, John and Antonoglou, Ioannis and Silver, David},
+  title = {Prioritized experience replay},
+  journal = {arXiv preprint arXiv:1511.05952},
+  year = {2015},
+  url = {https://arxiv.org/pdf/1511.05952}
+}
+</pre></td>
+</tr>
+<tr id="schulman2017proximal" class="entry">
+	<td>Schulman, J., Wolski, F., Dhariwal, P., Radford, A. and Klimov, O.</td>
+	<td>Proximal policy optimization algorithms <p class="infolinks">[<a href="javascript:toggleInfo('schulman2017proximal','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('schulman2017proximal','comment')">Comment</a>] [<a href="javascript:toggleInfo('schulman2017proximal','bibtex')">BibTeX</a>]</p></td>
+	<td>2017</td>
+	<td>arXiv preprint arXiv:1707.06347&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://arxiv.org/pdf/1707.06347">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_schulman2017proximal" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: We propose a new family of policy gradient methods for reinforcement learning, which alternate between sampling data through interaction with the environment, and optimizing a “surrogate” objective function using stochastic gradient ascent. Whereas standard policy gradient methods perform one gradient update per data sample, we propose a novel objective function that enables multiple epochs of minibatch updates. The new methods, which we call proximal policy optimization (PPO), have some of the benefits of trust region policy optimization (TRPO), but they are much simpler to implement, more general, and have better sample complexity (empirically). Our experiments test PPO on a collection of benchmark tasks, including simulated robotic locomotion and Atari game playing, and we show that PPO outperforms other online policy gradient methods, and overall strikes a favorable balance between sample complexity, simplicity, and wall-time.</td>
+</tr>
+<tr id="rev_schulman2017proximal" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Policy optimization. Citations - 2677</td>
+</tr>
+<tr id="bib_schulman2017proximal" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{schulman2017proximal,
+  author = {Schulman, John and Wolski, Filip and Dhariwal, Prafulla and Radford, Alec and Klimov, Oleg},
+  title = {Proximal policy optimization algorithms},
+  journal = {arXiv preprint arXiv:1707.06347},
+  year = {2017},
+  url = {https://arxiv.org/pdf/1707.06347}
+}
+</pre></td>
+</tr>
+<tr id="sharpe1998morningstar" class="entry">
+	<td>Sharpe, W.F.</td>
+	<td>Morningstar's risk-adjusted ratings <p class="infolinks">[<a href="javascript:toggleInfo('sharpe1998morningstar','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('sharpe1998morningstar','comment')">Comment</a>] [<a href="javascript:toggleInfo('sharpe1998morningstar','bibtex')">BibTeX</a>]</p></td>
+	<td>1998</td>
+	<td>Financial Analysts Journal<br/>Vol. 54(4), pp. 21-33&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://web.stanford.edu/~wfsharpe/art/msrar/msrar.doc">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_sharpe1998morningstar" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: The last decade has seen the rapid growth of investment via mutual funds across the globe. This has led to a demand for simple measures of the performance of such funds. In the United States, the most popular is the "risk-adjusted rating" (RAR) produced by Morningstar, Incorporated. This measure differs significantly from more traditional ones such as various forms of the Sharpe ratio. This paper investigates the properties of Morningstar's measure. We show that the RAR measure has characteristics similar to those of an expected utility function based on an underlying bilinear utility function. This is of some concern, since strict adherence to a goal of maximizing expected utility with such a function could lead to extreme investment strategies. Next, we show that in practice, Morningstar varies one of the parameters of this function in a manner that frequently leads to results similar to those that would be obtained with the more traditional excess return Sharpe Ratio. Finally, we argue that neither Morningstar's measure nor the excess return Sharpe Ratio is an efficient tool for choosing mutual funds within peer groups when constructing a multi-fund portfolio --the ostensible purpose for which Morningstar's rankings are produced.</td>
+</tr>
+<tr id="rev_sharpe1998morningstar" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Risk adjustment. Citations - 196</td>
+</tr>
+<tr id="bib_sharpe1998morningstar" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{sharpe1998morningstar,
+  author = {Sharpe, William F},
+  title = {Morningstar's risk-adjusted ratings},
+  journal = {Financial Analysts Journal},
+  publisher = {Taylor &amp; Francis},
+  year = {1998},
+  volume = {54},
+  number = {4},
+  pages = {21--33},
+  url = {https://web.stanford.edu/&nbsp;wfsharpe/art/msrar/msrar.doc}
+}
+</pre></td>
+</tr>
+<tr id="silver2016mastering" class="entry">
+	<td>Silver, D., Huang, A., Maddison, C.J., Guez, A., Sifre, L., Van Den Driessche, G., Schrittwieser, J., Antonoglou, I., Panneershelvam, V., Lanctot, M. and others</td>
+	<td>Mastering the game of Go with deep neural networks and tree search <p class="infolinks">[<a href="javascript:toggleInfo('silver2016mastering','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('silver2016mastering','comment')">Comment</a>] [<a href="javascript:toggleInfo('silver2016mastering','bibtex')">BibTeX</a>]</p></td>
+	<td>2016</td>
+	<td>nature<br/>Vol. 529(7587), pp. 484-489&nbsp;</td>
+	<td>article</td>
+	<td><a href="http://www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15780-s16/www/AlphaGo.nature16961.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_silver2016mastering" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: The game of Go has long been viewed as the most challenging of classic games for artificial intelligence owing to its enormous search space and the difficulty of evaluating board positions and moves. Here we introduce a new approach to computer Go that uses ‘value networks’ to evaluate board positions and ‘policy networks’ to select moves. These deep neural networks are trained by a novel combination of supervised learning from human expert games, and reinforcement learning from games of self-play. Without any lookahead search, the neural networks play Go at the level of state-of-the-art Monte Carlo tree search programs that simulate thousands of random games of self-play. We also introduce a new search algorithm that combines Monte Carlo simulation with value and policy networks. Using this search algorithm, our program AlphaGo achieved a 99.8% winning rate against other Go programs, and defeated the human European Go champion by 5 games to 0. This is the first time that a computer program has defeated a human professional player in the full-sized game of Go, a feat previously thought to be at least a decade away.</td>
+</tr>
+<tr id="rev_silver2016mastering" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Go with DNN. Citations - 8101</td>
+</tr>
+<tr id="bib_silver2016mastering" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{silver2016mastering,
+  author = {Silver, David and Huang, Aja and Maddison, Chris J and Guez, Arthur and Sifre, Laurent and Van Den Driessche, George and Schrittwieser, Julian and Antonoglou, Ioannis and Panneershelvam, Veda and Lanctot, Marc and others},
+  title = {Mastering the game of Go with deep neural networks and tree search},
+  journal = {nature},
+  publisher = {Nature Publishing Group},
+  year = {2016},
+  volume = {529},
+  number = {7587},
+  pages = {484--489},
+  url = {http://www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15780-s16/www/AlphaGo.nature16961.pdf}
+}
+</pre></td>
+</tr>
+<tr id="sutton1998introduction" class="entry">
+	<td>Sutton, R.S., Barto, A.G. and others</td>
+	<td>Introduction to reinforcement learning <p class="infolinks">[<a href="javascript:toggleInfo('sutton1998introduction','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('sutton1998introduction','comment')">Comment</a>] [<a href="javascript:toggleInfo('sutton1998introduction','bibtex')">BibTeX</a>]</p></td>
+	<td>1998</td>
+	<td><br/>Vol. 135&nbsp;</td>
+	<td>book</td>
+	<td><a href="https://login.cs.utexas.edu/sites/default/files/legacy_files/research/documents/1%20intro%20up%20to%20RL%3ATD.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_sutton1998introduction" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: We are nearing an important milestone in the history of life on earth, the point at which we can construct machines with the potential for exhibiting an intelligence comparable to ours.”-- David Waltz, 1988 (recent president of AAAI) Should occur in≈ 2030 for≈ $1000 We don't yet have the needed AI “software”(designs, ideas) But the hardware will be a tremendous economic spur to development of the ideas... perhaps at nearly the same time</td>
+</tr>
+<tr id="rev_sutton1998introduction" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Reinforcement learning. Citations - 7015</td>
+</tr>
+<tr id="bib_sutton1998introduction" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@book{sutton1998introduction,
+  author = {Sutton, Richard S and Barto, Andrew G and others},
+  title = {Introduction to reinforcement learning},
+  publisher = {MIT press Cambridge},
+  year = {1998},
+  volume = {135},
+  url = {https://login.cs.utexas.edu/sites/default/files/legacy_files/research/documents/1%20intro%20up%20to%20RL%3ATD.pdf}
+}
+</pre></td>
+</tr>
+<tr id="sutton2000policy" class="entry">
+	<td>Sutton, R.S., McAllester, D.A., Singh, S.P. and Mansour, Y.</td>
+	<td>Policy gradient methods for reinforcement learning with function approximation <p class="infolinks">[<a href="javascript:toggleInfo('sutton2000policy','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('sutton2000policy','comment')">Comment</a>] [<a href="javascript:toggleInfo('sutton2000policy','bibtex')">BibTeX</a>]</p></td>
+	<td>2000</td>
+	<td>Advances in neural information processing systems, pp. 1057-1063&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://papers.nips.cc/paper/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_sutton2000policy" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Function approximation is essential to reinforcement learning, but the standard approach of approximating a  value function and deter-mining a  policy from it has so far proven theoretically intractable. In this paper we explore an alternative approach in which the policy is  explicitly represented by its own function approximator, indepen-dent of the value function, and is updated according to the gradient of expected reward with respect to the policy parameters. Williams's REINFORCE method and actor-critic methods are examples of this approach. Our main new result is to show that the gradient can be written in a  form suitable for estimation from experience aided by an approximate action-value or advantage function. Using this result, we prove for the first time that a  version of policy iteration with arbitrary differentiable function approximation is convergent to a  locally optimal policy.</td>
+</tr>
+<tr id="rev_sutton2000policy" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Reinforcemetn learning. CItations - 3424</td>
+</tr>
+<tr id="bib_sutton2000policy" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{sutton2000policy,
+  author = {Sutton, Richard S and McAllester, David A and Singh, Satinder P and Mansour, Yishay},
+  title = {Policy gradient methods for reinforcement learning with function approximation},
+  booktitle = {Advances in neural information processing systems},
+  year = {2000},
+  pages = {1057--1063},
+  url = {http://papers.nips.cc/paper/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf}
+}
+</pre></td>
+</tr>
+<tr id="theate2020application" class="entry">
+	<td>Th&eacute;ate, T. and Ernst, D.</td>
+	<td>An application of deep reinforcement learning to algorithmic trading <p class="infolinks">[<a href="javascript:toggleInfo('theate2020application','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('theate2020application','comment')">Comment</a>] [<a href="javascript:toggleInfo('theate2020application','bibtex')">BibTeX</a>]</p></td>
+	<td>2020</td>
+	<td>arXiv preprint arXiv:2004.06627&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://arxiv.org/pdf/2004.06627">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_theate2020application" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: This scientific research paper presents an innovative approach based on deep reinforcement learning (DRL) to solve thealgorithmic trading problem of determining the optimal trading position at any point in time during a trading activityin stock markets.  It proposes a novel DRL trading strategy so as to maximise the resulting Sharpe ratio performanceindicator on a broad range of stock markets.  Denominated the Trading Deep Q-Network algorithm (TDQN), this newtrading strategy is inspired from the popular DQN algorithm and significantly adapted to the specific algorithmic tradingproblem at hand.  The training of the resulting reinforcement learning (RL) agent is entirely based on the generation ofartificial trajectories from a limited set of stock market historical data.  In order to objectively assess the performanceof  trading  strategies,  the  research  paper  also  proposes  a  novel,  more  rigorous  performance  assessment  methodology.Following this new performance assessment approach, promising results are reported for the TDQN strategy.</td>
+</tr>
+<tr id="rev_theate2020application" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Deep reinforcement learning. CItations - 1</td>
+</tr>
+<tr id="bib_theate2020application" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{theate2020application,
+  author = {Th&eacute;ate, Thibaut and Ernst, Damien},
+  title = {An application of deep reinforcement learning to algorithmic trading},
+  journal = {arXiv preprint arXiv:2004.06627},
+  year = {2020},
+  url = {https://arxiv.org/pdf/2004.06627}
+}
+</pre></td>
+</tr>
+<tr id="tran2018temporal" class="entry">
+	<td>Tran, D.T., Iosifidis, A., Kanniainen, J. and Gabbouj, M.</td>
+	<td>Temporal attention-augmented bilinear network for financial time-series data analysis <p class="infolinks">[<a href="javascript:toggleInfo('tran2018temporal','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('tran2018temporal','comment')">Comment</a>] [<a href="javascript:toggleInfo('tran2018temporal','bibtex')">BibTeX</a>]</p></td>
+	<td>2018</td>
+	<td>IEEE transactions on neural networks and learning systems<br/>Vol. 30(5), pp. 1407-1418&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://arxiv.org/pdf/1712.00975.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_tran2018temporal" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Financial time-series forecasting has long been achallenging problem because of the inherently noisy and stochas-tic nature of the market. In the High-Frequency Trading (HFT),forecasting for trading purposes is even a more challengingtasksince an automated inference system is required to be bothaccurate and fast. In this paper, we propose a neural networklayer architecture that incorporates the idea of bilinear projectionas well as an attention mechanism that enables the layer todetect and focus on crucial temporal information. The resultingnetwork is highly interpretable, given its ability to highlight theimportance and contribution of each temporal instance, thusallowing further analysis on the time instances of interest. Ourexperiments in a large-scale Limit Order Book (LOB) datasetshow that a two-hidden-layer network utilizing our proposedlayer outperforms by a large margin all existing state-of-the-artresults coming from much deeper architectures while requiringfar fewer computations.</td>
+</tr>
+<tr id="rev_tran2018temporal" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Temporal attention. Citations - 51</td>
+</tr>
+<tr id="bib_tran2018temporal" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{tran2018temporal,
+  author = {Tran, Dat Thanh and Iosifidis, Alexandros and Kanniainen, Juho and Gabbouj, Moncef},
+  title = {Temporal attention-augmented bilinear network for financial time-series data analysis},
+  journal = {IEEE transactions on neural networks and learning systems},
+  publisher = {IEEE},
+  year = {2018},
+  volume = {30},
+  number = {5},
+  pages = {1407--1418},
+  url = {https://arxiv.org/pdf/1712.00975.pdf}
+}
+</pre></td>
+</tr>
+<tr id="tsantekidis2017forecasting" class="entry">
+	<td>Tsantekidis, A., Passalis, N., Tefas, A., Kanniainen, J., Gabbouj, M. and Iosifidis, A.</td>
+	<td>Forecasting stock prices from the limit order book using convolutional neural networks <p class="infolinks">[<a href="javascript:toggleInfo('tsantekidis2017forecasting','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('tsantekidis2017forecasting','comment')">Comment</a>] [<a href="javascript:toggleInfo('tsantekidis2017forecasting','bibtex')">BibTeX</a>]</p></td>
+	<td>2017</td>
+	<td><br/>Vol. 12017 IEEE 19th Conference on Business Informatics (CBI), pp. 7-12&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://users.auth.gr/passalis/assets/pdf/confs/2017_CBI_CNNLOB.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_tsantekidis2017forecasting" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: In  today’s  financial  markets,  where  mosttrades are performed in their entirety by electronic meansand the largest fraction of them is completely automated,an opportunity has risen from analyzing this vast amountof transactions. Since all the transactions are recordedin great detail, investors can analyze all the generateddata and detect repeated patterns of the price movements.Being able to detect them in advance, allows them totake profitable positions or avoid anomalous events in thefinancial markets. In this work we proposed a deep learningmethodology, based on Convolutional Neural Networks(CNNs), that predicts the price movements of stocks, usingas input large-scale, high-frequency time-series derivedfrom the order book of financial exchanges. The datasetthat we use contains more than 4 million limit order eventsand our comparison with other methods, like MultilayerNeural Networks and Support Vector Machines, shows thatCNNs are better suited for this kind of task.</td>
+</tr>
+<tr id="rev_tsantekidis2017forecasting" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Forecasting using CNN. CItations - 91</td>
+</tr>
+<tr id="bib_tsantekidis2017forecasting" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{tsantekidis2017forecasting,
+  author = {Tsantekidis, Avraam and Passalis, Nikolaos and Tefas, Anastasios and Kanniainen, Juho and Gabbouj, Moncef and Iosifidis, Alexandros},
+  title = {Forecasting stock prices from the limit order book using convolutional neural networks},
+  booktitle = {2017 IEEE 19th Conference on Business Informatics (CBI)},
+  year = {2017},
+  volume = {1},
+  pages = {7--12},
+  url = {http://users.auth.gr/passalis/assets/pdf/confs/2017_CBI_CNNLOB.pdf}
+}
+</pre></td>
+</tr>
+<tr id="van2015deep" class="entry">
+	<td>Van Hasselt, H., Guez, A. and Silver, D.</td>
+	<td>Deep reinforcement learning with double q-learning <p class="infolinks">[<a href="javascript:toggleInfo('van2015deep','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('van2015deep','comment')">Comment</a>] [<a href="javascript:toggleInfo('van2015deep','bibtex')">BibTeX</a>]</p></td>
+	<td>2015</td>
+	<td>arXiv preprint arXiv:1509.06461&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://arxiv.org/pdf/1509.06461">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_van2015deep" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: The popular Q-learning algorithm is known to overestimateaction values under certain conditions. It was not previouslyknown  whether,  in  practice,  such  overestimations  are  com-mon, whether they harm performance, and whether they cangenerally  be  prevented.  In  this  paper,  we  answer  all  thesequestions affirmatively. In particular, we first show that therecent  DQN  algorithm,  which  combines  Q-learning  with  adeep neural network, suffers from substantial overestimationsin some games in the Atari 2600 domain. We then show thatthe idea behind the Double Q-learning algorithm, which wasintroduced  in  a  tabular  setting,  can  be  generalized  to  workwith large-scale function approximation. We propose a spe-cific adaptation to the DQN algorithm and show that the re-sulting algorithm not only reduces the observed overestima-tions, as hypothesized, but that this also leads to much betterperformance on several games.</td>
+</tr>
+<tr id="rev_van2015deep" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Deep reinforcement learning with q-learning, Citations - 2376</td>
+</tr>
+<tr id="bib_van2015deep" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{van2015deep,
+  author = {Van Hasselt, Hado and Guez, Arthur and Silver, David},
+  title = {Deep reinforcement learning with double q-learning},
+  journal = {arXiv preprint arXiv:1509.06461},
+  year = {2015},
+  url = {https://arxiv.org/pdf/1509.06461}
+}
+</pre></td>
+</tr>
+<tr id="vincent2010stacked" class="entry">
+	<td>Vincent, P., Larochelle, H., Lajoie, I., Bengio, Y., Manzagol, P.-A. and Bottou, L.</td>
+	<td>Stacked denoising autoencoders: Learning useful representations in a deep network with a local denoising criterion. <p class="infolinks">[<a href="javascript:toggleInfo('vincent2010stacked','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('vincent2010stacked','comment')">Comment</a>] [<a href="javascript:toggleInfo('vincent2010stacked','bibtex')">BibTeX</a>]</p></td>
+	<td>2010</td>
+	<td>Journal of machine learning research<br/>Vol. 11(12)&nbsp;</td>
+	<td>article</td>
+	<td><a href="http://www.jmlr.org/papers/volume11/vincent10a/vincent10a.pdf?source=post_page---------------------------">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_vincent2010stacked" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: We explore an original strategy for building deep networks,based on stacking layers ofdenoisingautoencoderswhich are trained locally to denoise corrupted versions of their inputs. The resultingalgorithm is a straightforward variation on the stacking ofordinary autoencoders.  It is howevershown on a benchmark of classification problems to yield significantly lower classification error,thus bridging the performance gap with deep belief networks(DBN), and in several cases surpass-ing it.  Higher level representations learnt in this purely unsupervised fashion also help boost theperformance of subsequent SVM classifiers.  Qualitative experiments show that, contrary to ordi-nary autoencoders, denoising autoencoders are able to learn Gabor-like edge detectors from naturalimage patches and larger stroke detectors from digit images. This work clearly establishes the valueof using a denoising criterion as a tractable unsupervised objective to guide the learning of usefulhigher level representations.</td>
+</tr>
+<tr id="rev_vincent2010stacked" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Autoencoders. Citations - 5084</td>
+</tr>
+<tr id="bib_vincent2010stacked" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{vincent2010stacked,
+  author = {Vincent, Pascal and Larochelle, Hugo and Lajoie, Isabelle and Bengio, Yoshua and Manzagol, Pierre-Antoine and Bottou, L&eacute;on},
+  title = {Stacked denoising autoencoders: Learning useful representations in a deep network with a local denoising criterion.},
+  journal = {Journal of machine learning research},
+  year = {2010},
+  volume = {11},
+  number = {12},
+  url = {http://www.jmlr.org/papers/volume11/vincent10a/vincent10a.pdf?source=post_page---------------------------}
+}
+</pre></td>
+</tr>
+<tr id="walker1931periodicity" class="entry">
+	<td>Walker, G.T.</td>
+	<td>On periodicity in series of related terms <p class="infolinks">[<a href="javascript:toggleInfo('walker1931periodicity','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('walker1931periodicity','comment')">Comment</a>] [<a href="javascript:toggleInfo('walker1931periodicity','bibtex')">BibTeX</a>]</p></td>
+	<td>1931</td>
+	<td>Proceedings of the Royal Society of London. Series A, Containing Papers of a Mathematical and Physical Character<br/>Vol. 131(818), pp. 518-532&nbsp;</td>
+	<td>article</td>
+	<td><a href="https://royalsocietypublishing.org/doi/abs/10.1098/rspa.1931.0069">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_walker1931periodicity" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: An important extension of our ideas regarding periodicity was made in 1927 when Yule pointed out that, instead of regarding a series of annual sunspot numbers as consisting merely of a harmonic series to which a series of random terms were added, we might suppose a certain amount of causal relationship between the successive annual numbers. In that case the system might be regarded as a physical system possessing one or more natural oscillations of its own, all subject to damping; and the effect of annual random disturbances would be to produce a fairly smooth curve with periods varying in amplitude and length, essentially as the sunspot numbers vary. If we call the departures from their mean of our series u1, u2.., Yule showed that the consequence of a single natural period is an equation like ux = kux-1 - ux-2 + vx, where vx represents the “accidental” external “disturbance”; and if there are two natural periods, ux = k1 (ux-1 + ux-3) - k2ux-2 - ux-4 + vx</td>
+</tr>
+<tr id="rev_walker1931periodicity" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Periodicity. Citations - 539</td>
+</tr>
+<tr id="bib_walker1931periodicity" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{walker1931periodicity,
+  author = {Walker, Gilbert Thomas},
+  title = {On periodicity in series of related terms},
+  journal = {Proceedings of the Royal Society of London. Series A, Containing Papers of a Mathematical and Physical Character},
+  publisher = {The Royal Society London},
+  year = {1931},
+  volume = {131},
+  number = {818},
+  pages = {518--532},
+  url = {https://royalsocietypublishing.org/doi/abs/10.1098/rspa.1931.0069}
+}
+</pre></td>
+</tr>
+<tr id="wang2016dueling" class="entry">
+	<td>Wang, Z., Schaul, T., Hessel, M., Hasselt, H., Lanctot, M. and Freitas, N.</td>
+	<td>Dueling network architectures for deep reinforcement learning <p class="infolinks">[<a href="javascript:toggleInfo('wang2016dueling','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('wang2016dueling','comment')">Comment</a>] [<a href="javascript:toggleInfo('wang2016dueling','bibtex')">BibTeX</a>]</p></td>
+	<td>2016</td>
+	<td>International conference on machine learning, pp. 1995-2003&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="http://proceedings.mlr.press/v48/wangf16.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_wang2016dueling" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: In recent years there have been many successesof  using  deep  representations  in  reinforcementlearning.   Still,  many  of  these  applications  useconventional architectures, such as convolutionalnetworks, LSTMs, or auto-encoders.  In this pa-per,  we present a new neural network architec-ture for model-free reinforcement learning.  Ourdueling network represents two separate estima-tors: one for the state value function and one forthe  state-dependent  action  advantage  function.The main benefit of this factoring is to general-ize learning across actions without imposing anychange to the underlying reinforcement learningalgorithm.   Our  results  show  that  this  architec-ture leads to better policy evaluation in the pres-ence of many similar-valued actions.  Moreover,the dueling architecture enables our RL agent tooutperform the state-of-the-art on the Atari 2600domain.</td>
+</tr>
+<tr id="rev_wang2016dueling" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Deep reinforcement learning. Citations - 1301</td>
+</tr>
+<tr id="bib_wang2016dueling" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{wang2016dueling,
+  author = {Wang, Ziyu and Schaul, Tom and Hessel, Matteo and Hasselt, Hado and Lanctot, Marc and Freitas, Nando},
+  title = {Dueling network architectures for deep reinforcement learning},
+  booktitle = {International conference on machine learning},
+  year = {2016},
+  pages = {1995--2003},
+  url = {http://proceedings.mlr.press/v48/wangf16.pdf}
+}
+</pre></td>
+</tr>
+<tr id="williams2007partially" class="entry">
+	<td>Williams, J.D. and Young, S.</td>
+	<td>Partially observable Markov decision processes for spoken dialog systems <p class="infolinks">[<a href="javascript:toggleInfo('williams2007partially','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('williams2007partially','comment')">Comment</a>] [<a href="javascript:toggleInfo('williams2007partially','bibtex')">BibTeX</a>]</p></td>
+	<td>2007</td>
+	<td>Computer Speech &amp; Language<br/>Vol. 21(2), pp. 393-422&nbsp;</td>
+	<td>article</td>
+	<td><a href="http://svr-www.eng.cam.ac.uk/~sjy/papers/wiyo07-j.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_williams2007partially" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: In a spoken dialog system, determining which action a machine should take in a given situation is a difficult problem because automatic speech recognition is unreliable and hence the state of the conversation can never be known with certainty. Much of the research in spoken dialog systems centres on mitigating this uncertainty and recent work has focussed on three largely disparate techniques: parallel dialog state hypotheses, local use of confidence scores, and automated planning. While in isolation each of these approaches can improve action selection, taken together they currently lack a unified statistical framework that admits global optimization. In this paper we cast a spoken dialog system as a partially observable Markov decision process (POMDP). We show how this formulation unifies and extends existing techniques to form a single principled framework. A number of illustrations are used to show qualitatively the potential benefits of POMDPs compared to existing techniques, and empirical results from dialog simulations are presented which demonstrate significant quantitative gains. Finally, some of the key challenges to advancing this method – in particular scalability – are briefly outlined.</td>
+</tr>
+<tr id="rev_williams2007partially" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: Markov decision process. Citations - 891</td>
+</tr>
+<tr id="bib_williams2007partially" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@article{williams2007partially,
+  author = {Williams, Jason D and Young, Steve},
+  title = {Partially observable Markov decision processes for spoken dialog systems},
+  journal = {Computer Speech &amp; Language},
+  publisher = {Elsevier},
+  year = {2007},
+  volume = {21},
+  number = {2},
+  pages = {393--422},
+  url = {http://svr-www.eng.cam.ac.uk/&nbsp;sjy/papers/wiyo07-j.pdf}
+}
+</pre></td>
+</tr>
+<tr id="yue2015beyond" class="entry">
+	<td>Yue-Hei Ng, J., Hausknecht, M., Vijayanarasimhan, S., Vinyals, O., Monga, R. and Toderici, G.</td>
+	<td>Beyond short snippets: Deep networks for video classification <p class="infolinks">[<a href="javascript:toggleInfo('yue2015beyond','abstract')">Abstract</a>] [<a href="javascript:toggleInfo('yue2015beyond','comment')">Comment</a>] [<a href="javascript:toggleInfo('yue2015beyond','bibtex')">BibTeX</a>]</p></td>
+	<td>2015</td>
+	<td>Proceedings of the IEEE conference on computer vision and pattern recognition, pp. 4694-4702&nbsp;</td>
+	<td>inproceedings</td>
+	<td><a href="https://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Ng_Beyond_Short_Snippets_2015_CVPR_paper.pdf">URL</a>&nbsp;</td>
+</tr>
+<tr id="abs_yue2015beyond" class="abstract noshow">
+	<td colspan="6"><b>Abstract</b>: Convolutional neural networks (CNNs) have been exten-sively applied for image recognition problems giving state-of-the-art  results  on  recognition,  detection,  segmentationand retrieval. In this work we propose and evaluate severaldeep neural network architectures to combine image infor-mation across a video over longer time periods than previ-ously attempted.  We propose two methods capable of han-dling full length videos.  The first method explores variousconvolutional  temporal  feature  pooling  architectures,  ex-amining the various design choices which need to be madewhen adapting a CNN for this task.  The second proposedmethod explicitly models the video as an ordered sequenceof frames.  For this purpose we employ a recurrent neuralnetwork that uses Long Short-Term Memory (LSTM) cellswhich are connected to the output of the underlying CNN.Our best networks exhibit significant performance improve-ments over previously published results on the Sports 1 mil-lion dataset (73.1% vs.  60.9%) and the UCF-101 datasetswith (88.6% vs. 88.0%) and without additional optical flowinformation (82.6% vs. 73.0%).</td>
+</tr>
+<tr id="rev_yue2015beyond" class="comment noshow">
+	<td colspan="6"><b>Comment</b>: DNN for video classification. Citations - 1666</td>
+</tr>
+<tr id="bib_yue2015beyond" class="bibtex noshow">
+<td colspan="6"><b>BibTeX</b>:
+<pre>
+@inproceedings{yue2015beyond,
+  author = {Yue-Hei Ng, Joe and Hausknecht, Matthew and Vijayanarasimhan, Sudheendra and Vinyals, Oriol and Monga, Rajat and Toderici, George},
+  title = {Beyond short snippets: Deep networks for video classification},
+  booktitle = {Proceedings of the IEEE conference on computer vision and pattern recognition},
+  year = {2015},
+  pages = {4694--4702},
+  url = {https://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Ng_Beyond_Short_Snippets_2015_CVPR_paper.pdf}
+}
+</pre></td>
+</tr>
+</tbody>
+</table>
+<footer>
+ <small>Created by <a href="http://jabref.sourceforge.net">JabRef</a> on 28/08/2020.</small>
+</footer>
+<!-- file generated by JabRef -->
+</body>
+</html>
