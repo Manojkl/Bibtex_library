@@ -267,9 +267,10 @@ statistical analysis of the dataset in comparison to PASCAL, ImageNet, and SUN. 
   year      = {2015},
   pages     = {2425--2433},
   abstract  = {We propose the task of free-form and open-ended Visual Question Answering (VQA). Given an image and a natural language question about the image, the task is to provide an accurate natural language answer. Mirroring real-world scenarios, such as helping the visually impaired, both the questions and answers are open-ended. Visual questions selectively target different areas of an image, including background details and underlying context. As a result, a system that succeeds at VQA typically needs a more detailed understanding of the image and complex reasoning than a system producing generic image captions. Moreover, VQA is amenable to automatic evaluation, since many open-ended answers contain only a few words or a closed set of answers that can be provided in a multiple-choice format. We provide a dataset containing ∼0.25M images, ∼0.76M questions, and ∼10M answers (www.visualqa.org), and discuss the information it provides. Numerous baselines for VQA are provided and compared with human performance.},
-  comment   = {VQA dataset. Citations - 2048},
+  comment   = {VQA dataset. Citations - 2048
+Review:
+Visual question answering},
   owner     = {manoj},
-  review    = {Visual question answering},
   timestamp = {2020.08.26},
   url       = {http://openaccess.thecvf.com/content_iccv_2015/papers/Antol_VQA_Visual_Question_ICCV_2015_paper.pdf},
 }
