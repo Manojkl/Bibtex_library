@@ -1,3 +1,4 @@
+% This file was created with JabRef 2.10.
 % Encoding: UTF-8
 
 
@@ -651,82 +652,3 @@ with the largest state-action values of the current policy, ie it outputs an" ap
   Url                      = {https://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Ng_Beyond_Short_Snippets_2015_CVPR_paper.pdf}
 }
 
-@Article{,
-}
-
-@InProceedings{mikolov2011extensions,
-  author       = {Mikolov, Tom{\'a}{\v{s}} and Kombrink, Stefan and Burget, Luk{\'a}{\v{s}} and {\v{C}}ernock{\`y}, Jan and Khudanpur, Sanjeev},
-  booktitle    = {2011 IEEE international conference on acoustics, speech and signal processing (ICASSP)},
-  title        = {Extensions of recurrent neural network language model},
-  year         = {2011},
-  organization = {IEEE},
-  pages        = {5528--5531},
-  abstract     = {We present several modifications of the original recurrent neural net work language model (RNN LM). While this model has been shown to significantly outperform many competitive language modeling techniques in terms of accuracy, the remaining problem is the computational complexity. In this work, we show approaches that lead to more than 15 times speedup for both training and testing phases. Next, we show importance of using a backpropagation through time algorithm. An empirical comparison with feedforward networks is also provided. In the end, we discuss possibilities how to reduce the amount of parameters in the model. The resulting RNN model can thus be smaller, faster both during training and testing, and more accurate than the basic one.},
-  comment      = {Language model. Citations - 4914},
-  url          = {http://www.fit.vutbr.cz/research/groups/speech/servite/2010/rnnlm_mikolov.pdf},
-}
-
-@Article{,
-}
-
-@InProceedings{kiros2014multimodal,
-  author    = {Kiros, Ryan and Salakhutdinov, Ruslan and Zemel, Rich},
-  booktitle = {International conference on machine learning},
-  title     = {Multimodal neural language models},
-  year      = {2014},
-  pages     = {595--603},
-  abstract  = {We introduce two multimodal neural language models: models of natural language that can be conditioned on other modalities. An imagetext multimodal neural language model can be used to retrieve images given complex sentence queries, retrieve phrase descriptions given image queries, as well as generate text conditioned on images. We show that in the case of image-text modelling we can jointly learn word representations and image features by training our models together with a convolutional network. Unlike many of the existing methods, our approach can generate sentence descriptions for images without the use of templates, structured prediction,
-and/or syntactic trees. While we focus on imagetext modelling, our algorithms can be easily applied to other modalities such as audio.},
-  comment   = {Langauge model. Citations - 541},
-  url       = {http://www.jmlr.org/proceedings/papers/v32/kiros14.pdf},
-}
-
-@Article{kim2015character,
-  author   = {Kim, Yoon and Jernite, Yacine and Sontag, David and Rush, Alexander M},
-  journal  = {arXiv preprint arXiv:1508.06615},
-  title    = {Character-aware neural language models},
-  year     = {2015},
-  abstract = {We describe a simple neural language model that relies only on character-level inputs. Predictions are still made at the word-level. Our model employs a convolutional neural network (CNN) and a highway network over characters, whose output is given to a long short-term memory (LSTM) recurrent neural network language model (RNN-LM). On the English Penn Treebank the model is on par with the existing state-of-the-art despite having 60% fewer parameters. On languages with rich morphology (Arabic, Czech, French, German, Spanish, Russian), the model outperforms word-level/morpheme-level LSTM baselines, again with fewer parameters. The results suggest that on many languages, character inputs are sufficient for language modeling. Analysis of word representations obtained from the character composition part of the model reveals that the model is able to encode, from characters
-only, both semantic and orthographic information.},
-  comment  = {Language model. Citations - 1361},
-  url      = {https://arxiv.org/pdf/1508.06615.pdf?source=post_page---------------------------},
-}
-
-@InProceedings{graves2013speech,
-  author       = {Graves, Alex and Mohamed, Abdel-rahman and Hinton, Geoffrey},
-  booktitle    = {2013 IEEE international conference on acoustics, speech and signal processing},
-  title        = {Speech recognition with deep recurrent neural networks},
-  year         = {2013},
-  organization = {IEEE},
-  pages        = {6645--6649},
-  abstract     = {Recurrent neural networks (RNNs) are a powerful model for sequential data. End-to-end training methods such as Connectionist Temporal Classification make it possible to train RNNs for sequence labelling problems where the input-output alignment is unknown. The combination of these methods with the Long Short-term Memory RNN architecture has proved particularly fruitful, delivering state-of-the-art results in cursive handwriting recognition. However RNN performance in speech recognition has so far been disappointing, with better results returned by deep feedforward networks. This paper investigates deep recurrent neural networks, which combine the multiple levels of representation that have proved so effective in deep networks with the flexible use of long range context that empowers RNNs. When trained end-to-end with suitable regularisation, we find that deep Long Short-term Memory RNNs achieve a test set error of 17.7% on the TIMIT
-phoneme recognition benchmark, which to our knowledge is
-the best recorded score.},
-  comment      = {Speech recognition. CItation - 6205},
-  url          = {https://arxiv.org/pdf/1303.5778.pdfï¼‰ï¼š“å¦‚æžœLSTMç”¨äºŽéš è— å±‚ï¼Œæˆ‘ä»¬å°†å¾—åˆ°},
-}
-
-@Article{hinton2012deep,
-  author    = {Hinton, Geoffrey and Deng, Li and Yu, Dong and Dahl, George E and Mohamed, Abdel-rahman and Jaitly, Navdeep and Senior, Andrew and Vanhoucke, Vincent and Nguyen, Patrick and Sainath, Tara N and others},
-  journal   = {IEEE Signal processing magazine},
-  title     = {Deep neural networks for acoustic modeling in speech recognition: The shared views of four research groups},
-  year      = {2012},
-  number    = {6},
-  pages     = {82--97},
-  volume    = {29},
-  abstract  = {Recurrent neural networks (RNNs) are a powerful model for
-sequential data. End-to-end training methods such as Connectionist Temporal Classification make it possible to train RNNs for sequence labelling problems where the input-output alignment is unknown. The combination of these methods with the Long Short-term Memory RNN architecture has proved
-particularly fruitful, delivering state-of-the-art results in cursive handwriting recognition. However RNN performance in
-speech recognition has so far been disappointing, with better
-results returned by deep feedforward networks. This paper investigates deep recurrent neural networks, which combine the
-multiple levels of representation that have proved so effective
-in deep networks with the flexible use of long range context
-that empowers RNNs. When trained end-to-end with suitable regularisation, we find that deep Long Short-term Memory RNNs achieve a test set error of 17.7% on the TIMIT
-phoneme recognition benchmark, which to our knowledge is
-the best recorded score.},
-  comment   = {Speech recognition. CItation - 8264},
-  publisher = {IEEE},
-  url       = {https://arxiv.org/pdf/1303.5778.pdfï¼‰ï¼š“å¦‚æžœLSTMç”¨äºŽéš è— å±‚ï¼Œæˆ‘ä»¬å°†å¾—åˆ°},
-}
-
-@Comment{jabref-meta: databaseType:bibtex;}
