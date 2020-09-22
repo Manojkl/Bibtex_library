@@ -49,6 +49,23 @@
   Url                      = {https://ieeexplore.ieee.org/iel7/34/4359286/07803544.pdf}
 }
 
+@Article{bao2005canny,
+  Title                    = {Canny edge detection enhancement by scale multiplication},
+  Author                   = {Bao, Paul and Zhang, Lei and Wu, Xiaolin},
+  Journal                  = {IEEE transactions on pattern analysis and machine intelligence},
+  Year                     = {2005},
+  Number                   = {9},
+  Pages                    = {1485--1490},
+  Volume                   = {27},
+
+  Abstract                 = {The technique of scale multiplication is analyzed in the framework of Canny edge detection. A scale multiplication function is defined as the product of the responses of the detection filter at two scales. Edge maps are constructed as the local maxima by thresholding the scale multiplication results. The detection and localization criteria of the scale multiplication are derived. At a small loss in the detection criterion, the localization criterion can be much improved by scale multiplication. The product of the two criteria for scale multiplication is greater than that for a single scale, which leads to better edge detection performance. Experimental results are presented.},
+  Comment                  = {Canny edge detection.},
+  Owner                    = {manoj},
+  Publisher                = {IEEE},
+  Timestamp                = {2020.09.22},
+  Url                      = {ftp://openstorage.gunadarma.ac.id/research/IEEE/PAMI/Sep_05/i1485.pdf}
+}
+
 @Article{chen2017deeplab,
   Title                    = {Deeplab: Semantic image segmentation with deep convolutional nets, atrous convolution, and fully connected crfs},
   Author                   = {Chen, Liang-Chieh and Papandreou, George and Kokkinos, Iasonas and Murphy, Kevin and Yuille, Alan L},
@@ -106,6 +123,20 @@
   Owner                    = {manoj},
   Timestamp                = {2020.08.26},
   Url                      = {https://www.researchgate.net/profile/Li_Jia_Li/publication/221361415_ImageNet_a_Large-Scale_Hierarchical_Image_Database/links/00b495388120dbc339000000/ImageNet-a-Large-Scale-Hierarchical-Image-Database.pdf}
+}
+
+@InProceedings{dollar2013structured,
+  Title                    = {Structured forests for fast edge detection},
+  Author                   = {Doll{\'a}r, Piotr and Zitnick, C Lawrence},
+  Booktitle                = {Proceedings of the IEEE international conference on computer vision},
+  Year                     = {2013},
+  Pages                    = {1841--1848},
+
+  Abstract                 = {Edge detection is a critical component of many vision systems, including object detectors and image segmentation algorithms. Patches of edges exhibit well-known forms of local structure, such as straight lines or T-junctions. In this paper we take advantage of the structure present in local image patches to learn both an accurate and computationally efficient edge detector. We formulate the problem of predicting local edge masks in a structured learning framework applied to random decision forests. Our novel approach to learning decision trees robustly maps the structured labels to a discrete space on which standard information gain measures may be evaluated. The result is an approach that obtains realtime performance that is orders of magnitude faster than many competing state-of-the-art approaches, while also achieving state-of-the-art edge detection results on the BSDS500 Segmentation dataset and NYU Depth dataset. Finally, we show the potential of our approach as a general purpose edge detector by showing our learned edge models generalize well across datasets.},
+  Comment                  = {Edge detection},
+  Owner                    = {manoj},
+  Timestamp                = {2020.09.22},
+  Url                      = {http://openaccess.thecvf.com/content_iccv_2013/papers/Dollar_Structured_Forests_for_2013_ICCV_paper.pdf}
 }
 
 @Article{edelman1997computational,
@@ -172,6 +203,22 @@
   Owner                    = {manoj},
   Timestamp                = {2020.08.26},
   Url                      = {http://openaccess.thecvf.com/content_ICCV_2017/papers/Goyal_The_Something_Something_ICCV_2017_paper.pdf}
+}
+
+@InProceedings{isola2014crisp,
+  Title                    = {Crisp boundary detection using pointwise mutual information},
+  Author                   = {Isola, Phillip and Zoran, Daniel and Krishnan, Dilip and Adelson, Edward H},
+  Booktitle                = {European Conference on Computer Vision},
+  Year                     = {2014},
+  Organization             = {Springer},
+  Pages                    = {799--814},
+
+  Abstract                 = {Detecting boundaries between semantically meaningful objects in visual scenes is an important component of many vision algorithms. In this paper, we propose a novel method for detecting such boundaries based on a simple underlying principle: pixels belonging to the same object exhibit higher statistical dependencies than pixels belonging to different objects. We show how to derive an affinity measure based on this principle using pointwise mutual information, and we show that this measure is indeed a good predictor of whether or not two pixels reside on the same object. Using this affinity with spectral clustering, we can find object boundaries in the image – achieving state-of-the-art results on the BSDS500 dataset. Our method produces pixel-level accurate
+boundaries while requiring minimal feature engineering.},
+  Comment                  = {Edge detection},
+  Owner                    = {manoj},
+  Timestamp                = {2020.09.22},
+  Url                      = {https://link.springer.com/content/pdf/10.1007/978-3-319-10578-9_52.pdf}
 }
 
 @Article{jones2003fast,
@@ -401,6 +448,21 @@ augments 12 rigid categories of the PASCAL VOC 2012 [4] with 3D annotations. Fur
   Owner                    = {manoj},
   Timestamp                = {2020.08.26},
   Url                      = {https://cvgl.stanford.edu/papers/xiang_wacv14.pdf}
+}
+
+@InProceedings{xie2015holistically,
+  Title                    = {Holistically-nested edge detection},
+  Author                   = {Xie, Saining and Tu, Zhuowen},
+  Booktitle                = {Proceedings of the IEEE international conference on computer vision},
+  Year                     = {2015},
+  Pages                    = {1395--1403},
+
+  Abstract                 = {We develop a new edge detection algorithm that addresses two important issues in this long-standing vision problem: (1) holistic image training and prediction; and (2) multi-scale and multi-level feature learning. Our proposed method, holistically-nested edge detection (HED), performs image-to-image prediction by means of a deep learning model that leverages fully convolutional neural networks and deeply-supervised nets. HED automatically learns rich hierarchical representations (guided by deep supervision on
+side responses) that are important in order to resolve the challenging ambiguity in edge and object boundary detection. We significantly advance the state-of-the-art on the BSD500 dataset (ODS F-score of .782) and the NYU Depth dataset (ODS F-score of .746), and do so with an improved speed (0.4s per image) that is orders of magnitude faster than some recent CNN-based edge detection algorithms.},
+  Comment                  = {Edge detection},
+  Owner                    = {manoj},
+  Timestamp                = {2020.09.22},
+  Url                      = {http://openaccess.thecvf.com/content_iccv_2015/papers/Xie_Holistically-Nested_Edge_Detection_ICCV_2015_paper.pdf}
 }
 
 @Article{,

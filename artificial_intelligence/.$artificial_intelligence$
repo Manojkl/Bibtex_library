@@ -1,0 +1,332 @@
+% This file was created with JabRef 2.10.
+% Encoding: UTF-8
+
+
+@InProceedings{bahdanau2016end,
+  Title                    = {End-to-end attention-based large vocabulary speech recognition},
+  Author                   = {Bahdanau, Dzmitry and Chorowski, Jan and Serdyuk, Dmitriy and Brakel, Philemon and Bengio, Yoshua},
+  Booktitle                = {2016 IEEE international conference on acoustics, speech and signal processing (ICASSP)},
+  Year                     = {2016},
+  Organization             = {IEEE},
+  Pages                    = {4945--4949},
+
+  Abstract                 = {Many of the current state-of-the-art Large Vocabulary Continuous Speech Recognition Systems (LVCSR) are hybrids of neural networks and Hidden Markov Models (HMMs). Most of these systems contain separate components that deal with the acoustic modelling, language modelling and sequence decoding. We investigate a more direct approach in which the HMM is replaced with a Recurrent Neural Network (RNN) that performs sequence prediction directly at the character level. Alignment between the input features and
+the desired character sequence is learned automatically by an
+attention mechanism built into the RNN. For each predicted
+character, the attention mechanism scans the input sequence
+and chooses relevant frames. We propose two methods to
+speed up this operation: limiting the scan to a subset of most promising frames and pooling over time the information contained in neighboring frames, thereby reducing source sequence length. Integrating an n-gram language model into the decoding process yields recognition accuracies similar to other HMM-free RNN-based approaches.},
+  Comment                  = {Speech recognition. Citations - 776},
+  Url                      = {https://arxiv.org/pdf/1508.04395}
+}
+
+@InProceedings{chorowski2015attention,
+  Title                    = {Attention-based models for speech recognition},
+  Author                   = {Chorowski, Jan K and Bahdanau, Dzmitry and Serdyuk, Dmitriy and Cho, Kyunghyun and Bengio, Yoshua},
+  Booktitle                = {Advances in neural information processing systems},
+  Year                     = {2015},
+  Pages                    = {577--585},
+
+  Abstract                 = {Recurrent sequence generators conditioned on input data through an attention mechanism have recently shown very good performance on a range of tasks including machine translation, handwriting synthesis and image caption generation [3]. We extend the attention-mechanism with features needed for speech recognition. We show that while an adaptation of the model used for machine translation in reaches a competitive 18.7% phoneme error rate (PER) on the TIMIT phoneme recognition task, it can only be applied to utterances which are roughly as long as the ones it was trained on. We offer a qualitative explanation of this failure and propose a novel and generic method of adding location-awareness
+to the attention mechanism to alleviate this issue. The new method yields a model that is robust to long inputs and achieves 18% PER in single utterances and 20% in 10-times longer (repeated) utterances. Finally, we propose a change to the attention mechanism that prevents it from concentrating too much on single frames,
+which further reduces PER to 17.6% level.},
+  Comment                  = {Speech recognition. Citations - 1354},
+  Url                      = {http://papers.nips.cc/paper/5847-attention-based-models-for-speech-recognition.pdf}
+}
+
+@Article{chung2014empirical,
+  Title                    = {Empirical evaluation of gated recurrent neural networks on sequence modeling},
+  Author                   = {Chung, Junyoung and Gulcehre, Caglar and Cho, KyungHyun and Bengio, Yoshua},
+  Journal                  = {arXiv preprint arXiv:1412.3555},
+  Year                     = {2014},
+
+  Abstract                 = {In this paper we compare different types of recurrent units in recurrent neural net-works (RNNs). Especially, we focus on more sophisticated units that implementa gating mechanism, such as a long short-term memory (LSTM) unit and a re-cently proposed gated recurrent unit (GRU). We evaluate these recurrent units onthe tasks of polyphonic music modeling and speech signal modeling. Our exper-iments revealed that these advanced recurrent units are indeed better than moretraditional recurrent units such astanhunits. Also, we found GRU to be compa-rable to LSTM.},
+  Comment                  = {gated RNN. Citations - 5072},
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.27},
+  Url                      = {https://arxiv.org/pdf/1412.3555.pdf?ref=hackernoon.com}
+}
+
+@InProceedings{graves2013hybrid,
+  Title                    = {Hybrid speech recognition with deep bidirectional LSTM},
+  Author                   = {Graves, Alex and Jaitly, Navdeep and Mohamed, Abdel-rahman},
+  Booktitle                = {2013 IEEE workshop on automatic speech recognition and understanding},
+  Year                     = {2013},
+  Organization             = {IEEE},
+  Pages                    = {273--278},
+
+  Abstract                 = {Deep Bidirectional LSTM (DBLSTM) recurrent neural networks have recently been shown to give state-of-the-art performance on the TIMIT speech database. However, the results in that work relied on recurrent-neural-network-specific objective functions, which are difficult to integrate with existing large vocabulary speech recognition systems. This paper investigates the use of DBLSTM as an acoustic model in a standard neural network-HMM hybrid system. We find that a DBLSTM-HMM hybrid gives equally good results on TIMIT as the previous work. It also outperforms both GMM and deep network benchmarks on a subset of the Wall Street Journal corpus. However the improvement in word error rate over the deep network is modest, despite a great increase in framelevel accuracy. We conclude that the hybrid approach with DBLSTM appears to be well suited for tasks where acoustic modelling predominates. Further investigation needs to be conducted to understand how to better leverage the improvements in frame-level accuracy towards better word error rates},
+  Comment                  = {Speech recognition. Citations - 1150},
+  Url                      = {http://www.cs.toronto.edu/~graves/asru_2013.pdf}
+}
+
+@InProceedings{Graves2013,
+  Title                    = {Speech recognition with deep recurrent neural networks},
+  Author                   = {Graves, Alex and Mohamed, Abdel-rahman and Hinton, Geoffrey},
+  Booktitle                = {2013 IEEE international conference on acoustics, speech and signal processing},
+  Year                     = {2013},
+  Organization             = {IEEE},
+  Pages                    = {6645--6649},
+
+  Abstract                 = {Recurrent neural networks (RNNs) are a powerful model for sequential data. End-to-end training methods such as Connectionist Temporal Classification make it possible to train RNNs for sequence labelling problems where the input-output alignment is unknown. The combination of these methods with the Long Short-term Memory RNN architecture has proved particularly fruitful, delivering state-of-the-art results in cursive handwriting recognition. However RNN performance in speech recognition has so far been disappointing, with better results returned by deep feedforward networks. This paper investigates deep recurrent neural networks, which combine the multiple levels of representation that have proved so effective in deep networks with the flexible use of long range context that empowers RNNs. When trained end-to-end with suitable regularisation, we find that deep Long Short-term Memory RNNs achieve a test set error of 17.7% on the TIMIT
+phoneme recognition benchmark, which to our knowledge is
+the best recorded score.},
+  Comment                  = {Speech recognition. CItation - 6205},
+  Url                      = {https://arxiv.org/pdf/1303.5778.pdfï¼‰ï¼š“å¦‚æžœLSTMç”¨äºŽéš è— å±‚ï¼Œæˆ‘ä»¬å°†å¾—åˆ°}
+}
+
+@InProceedings{graves2013speech,
+  Title                    = {Speech recognition with deep recurrent neural networks},
+  Author                   = {Graves, Alex and Mohamed, Abdel-rahman and Hinton, Geoffrey},
+  Booktitle                = {2013 IEEE international conference on acoustics, speech and signal processing},
+  Year                     = {2013},
+  Organization             = {IEEE},
+  Pages                    = {6645--6649},
+
+  Abstract                 = {Recurrent neural networks (RNNs) are a powerful model forsequential data. End-to-end training methods such as Connec-tionist Temporal Classification make it possible to train RNNsfor sequence labelling problems where the input-output align-ment is unknown. The combination of these methods withthe Long Short-term Memory RNN architecture has provedparticularly fruitful, delivering state-of-the-art results in cur-sive handwriting recognition. However RNN performance inspeech recognition has so far been disappointing, with betterresults returned by deep feedforward networks. This paper in-vestigatesdeep recurrent neural networks, which combine themultiple levels of representation that have proved so effectivein deep networks with the flexible use of long range contextthat empowers RNNs. When trained end-to-end with suit-able regularisation, we find that deep Long Short-term Mem-ory RNNs achieve a test set error of 17.7% on the TIMITphoneme recognition benchmark, which to our knowledge isthe best recorded score.},
+  Comment                  = {Speech recognition using DRNN. Citations - 6139},
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.27},
+  Url                      = {https://arxiv.org/pdf/1303.5778.pdf%C3%AF%C2%BC%E2%80%B0%C3%AF%C2%BC%C5%A1%E2%80%9C%C3%A5%C2%A6%E2%80%9A%C3%A6%C5%BE%C5%93LSTM%C3%A7%E2%80%9D%C2%A8%C3%A4%C2%BA%C5%BD%C3%A9%C5%A1%20%C3%A8%E2%80%94%20%C3%A5%C2%B1%E2%80%9A%C3%AF%C2%BC%C5%92%C3%A6%CB%86%E2%80%98%C3%A4%C2%BB%C2%AC%C3%A5%C2%B0%E2%80%A0%C3%A5%C2%BE%E2%80%94%C3%A5%CB%86%C2%B0}
+}
+
+@InProceedings{He2016,
+  Title                    = {Deep residual learning for image recognition},
+  Author                   = {He, Kaiming and Zhang, Xiangyu and Ren, Shaoqing and Sun, Jian},
+  Booktitle                = {Proceedings of the IEEE conference on computer vision and pattern recognition},
+  Year                     = {2016},
+  Note                     = {Citation - 52731},
+  Pages                    = {770--778},
+
+  Abstract                 = {Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions with reference to the layer inputs, instead of learning unreferenced functions. We provide comprehensive empirical evidence showing that these residual networks are easier to optimize, and can gain accuracy from considerably increased depth. On the ImageNet dataset we evaluate residual nets with a depth of up to 152 layers—8× deeper than VGG nets [40] but still having lower complexity. An ensemble of these residual nets achieves 3.57% error on the ImageNet test set. This result won the 1st place on the ILSVRC 2015 classification task. We also present analysis on CIFAR-10 with 100 and 1000 layers. The depth of representations is of central importance for many visual recognition tasks. Solely due to our extremely deep representations, we obtain a 28% relative improvement on the COCO object detection dataset. Deep residual nets are foundations of our submissions to ILSVRC & COCO 2015 competitions1, where we also won the 1st places on the tasks of ImageNet detection, ImageNet localization, COCO detection, and COCO segmentation.},
+  Comment                  = {MS Resnet},
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.14},
+  Url                      = {https://openaccess.thecvf.com/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf}
+}
+
+@Article{Hinton2012,
+  Title                    = {Deep neural networks for acoustic modeling in speech recognition: The shared views of four research groups},
+  Author                   = {Hinton, Geoffrey and Deng, Li and Yu, Dong and Dahl, George E and Mohamed, Abdel-rahman and Jaitly, Navdeep and Senior, Andrew and Vanhoucke, Vincent and Nguyen, Patrick and Sainath, Tara N and others},
+  Journal                  = {IEEE Signal processing magazine},
+  Year                     = {2012},
+  Number                   = {6},
+  Pages                    = {82--97},
+  Volume                   = {29},
+
+  Abstract                 = {Most current speech recognition systems use hidden Markov models (HMMs) to deal with the temporal variability of speech and Gaussian mixture models (GMMs) to deter-mine how well each state of each HMM fits a frame or a short window of frames of coefficients that repre-sents the acoustic input. An alternative way to evaluate the fit is to use a feed-forward neural network that takes several frames of coefficients as input and produces posterior proba-bilities over HMM states as output. Deep neural networks (DNNs) that have many hidden layers and are trained using new methods have been shown to outperform GMMs on a vari-ety of speech recognition benchmarks, sometimes by a large margin. This article provides an overview of this progress and represents the shared views of four research groups that have had recent successes in using DNNs for acoustic modeling in speech recognition},
+  Comment                  = {DNN for speech. Citations - 8210},
+  Owner                    = {manoj},
+  Publisher                = {IEEE},
+  Timestamp                = {2020.08.27},
+  Url                      = {https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/HintonDengYuEtAl-SPM2012.pdf}
+}
+
+@Article{hinton2012deep,
+  Title                    = {Deep neural networks for acoustic modeling in speech recognition: The shared views of four research groups},
+  Author                   = {Hinton, Geoffrey and Deng, Li and Yu, Dong and Dahl, George E and Mohamed, Abdel-rahman and Jaitly, Navdeep and Senior, Andrew and Vanhoucke, Vincent and Nguyen, Patrick and Sainath, Tara N and others},
+  Journal                  = {IEEE Signal processing magazine},
+  Year                     = {2012},
+  Number                   = {6},
+  Pages                    = {82--97},
+  Volume                   = {29},
+
+  Abstract                 = {Recurrent neural networks (RNNs) are a powerful model for
+sequential data. End-to-end training methods such as Connectionist Temporal Classification make it possible to train RNNs for sequence labelling problems where the input-output alignment is unknown. The combination of these methods with the Long Short-term Memory RNN architecture has proved
+particularly fruitful, delivering state-of-the-art results in cursive handwriting recognition. However RNN performance in
+speech recognition has so far been disappointing, with better
+results returned by deep feedforward networks. This paper investigates deep recurrent neural networks, which combine the
+multiple levels of representation that have proved so effective
+in deep networks with the flexible use of long range context
+that empowers RNNs. When trained end-to-end with suitable regularisation, we find that deep Long Short-term Memory RNNs achieve a test set error of 17.7% on the TIMIT
+phoneme recognition benchmark, which to our knowledge is
+the best recorded score.},
+  Comment                  = {Speech recognition. CItation - 8264},
+  Publisher                = {IEEE},
+  Url                      = {https://arxiv.org/pdf/1303.5778.pdfï¼‰ï¼š“å¦‚æžœLSTMç”¨äºŽéš è— å±‚ï¼Œæˆ‘ä»¬å°†å¾—åˆ°}
+}
+
+@Article{kim2015character,
+  Title                    = {Character-aware neural language models},
+  Author                   = {Kim, Yoon and Jernite, Yacine and Sontag, David and Rush, Alexander M},
+  Journal                  = {arXiv preprint arXiv:1508.06615},
+  Year                     = {2015},
+
+  Abstract                 = {We describe a simple neural language model that relies only on character-level inputs. Predictions are still made at the word-level. Our model employs a convolutional neural network (CNN) and a highway network over characters, whose output is given to a long short-term memory (LSTM) recurrent neural network language model (RNN-LM). On the English Penn Treebank the model is on par with the existing state-of-the-art despite having 60% fewer parameters. On languages with rich morphology (Arabic, Czech, French, German, Spanish, Russian), the model outperforms word-level/morpheme-level LSTM baselines, again with fewer parameters. The results suggest that on many languages, character inputs are sufficient for language modeling. Analysis of word representations obtained from the character composition part of the model reveals that the model is able to encode, from characters
+only, both semantic and orthographic information.},
+  Comment                  = {Language model. Citations - 1361},
+  Url                      = {https://arxiv.org/pdf/1508.06615.pdf?source=post_page---------------------------}
+}
+
+@InProceedings{kiros2014multimodal,
+  Title                    = {Multimodal neural language models},
+  Author                   = {Kiros, Ryan and Salakhutdinov, Ruslan and Zemel, Rich},
+  Booktitle                = {International conference on machine learning},
+  Year                     = {2014},
+  Pages                    = {595--603},
+
+  Abstract                 = {We introduce two multimodal neural language models: models of natural language that can be conditioned on other modalities. An imagetext multimodal neural language model can be used to retrieve images given complex sentence queries, retrieve phrase descriptions given image queries, as well as generate text conditioned on images. We show that in the case of image-text modelling we can jointly learn word representations and image features by training our models together with a convolutional network. Unlike many of the existing methods, our approach can generate sentence descriptions for images without the use of templates, structured prediction,
+and/or syntactic trees. While we focus on imagetext modelling, our algorithms can be easily applied to other modalities such as audio.},
+  Comment                  = {Langauge model. Citations - 541},
+  Url                      = {http://www.jmlr.org/proceedings/papers/v32/kiros14.pdf}
+}
+
+@InProceedings{Mikolov2011,
+  Title                    = {Extensions of recurrent neural network language model},
+  Author                   = {Mikolov, Tom{\'a}{\v{s}} and Kombrink, Stefan and Burget, Luk{\'a}{\v{s}} and {\v{C}}ernock{\`y}, Jan and Khudanpur, Sanjeev},
+  Booktitle                = {2011 IEEE international conference on acoustics, speech and signal processing (ICASSP)},
+  Year                     = {2011},
+  Organization             = {IEEE},
+  Pages                    = {5528--5531},
+
+  Abstract                 = {We present several modifications of the original recurrent neural net work language model (RNN LM). While this model has been shown to significantly outperform many competitive language modeling techniques in terms of accuracy, the remaining problem is the computational complexity. In this work, we show approaches that lead to more than 15 times speedup for both training and testing phases. Next, we show importance of using a backpropagation through time algorithm. An empirical comparison with feedforward networks is also provided. In the end, we discuss possibilities how to reduce the amount of parameters in the model. The resulting RNN model can thus be smaller, faster both during training and testing, and more accurate than the basic one.},
+  Comment                  = {Language model. Citations - 4914},
+  Url                      = {http://www.fit.vutbr.cz/research/groups/speech/servite/2010/rnnlm_mikolov.pdf}
+}
+
+@InProceedings{mikolov2011extensions,
+  Title                    = {Extensions of recurrent neural network language model},
+  Author                   = {Mikolov, Tom{\'a}{\v{s}} and Kombrink, Stefan and Burget, Luk{\'a}{\v{s}} and {\v{C}}ernock{\`y}, Jan and Khudanpur, Sanjeev},
+  Booktitle                = {2011 IEEE international conference on acoustics, speech and signal processing (ICASSP)},
+  Year                     = {2011},
+  Organization             = {IEEE},
+  Pages                    = {5528--5531},
+
+  Abstract                 = {We present several modifications of the original recurrent neural net work language model (RNN LM). While this model has been shown to significantly outperform many competitive language modeling techniques in terms of accuracy, the remaining problem is the computational complexity. In this work, we show approaches that lead to more than 15 times speedup for both training and testing phases. Next, we show importance of using a backpropagation through time algorithm. An empirical comparison with feedforward networks is also provided. In the end, we discuss possibilities how to reduce the amount of parameters in the model. The resulting RNN model can thus be smaller, faster both during training and testing, and more accurate than the basic one.},
+  Comment                  = {Language model. Citations - 4914},
+  Url                      = {http://www.fit.vutbr.cz/research/groups/speech/servite/2010/rnnlm_mikolov.pdf}
+}
+
+@Book{Minsky2017,
+  Title                    = {Perceptrons: An introduction to computational geometry},
+  Author                   = {Minsky, Marvin and Papert, Seymour A},
+  Publisher                = {MIT press},
+  Year                     = {2017},
+
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.14}
+}
+
+@Article{sak2014long,
+  Title                    = {Long short-term memory based recurrent neural network architectures for large vocabulary speech recognition},
+  Author                   = {Sak, Ha{\c{s}}im and Senior, Andrew and Beaufays, Fran{\c{c}}oise},
+  Journal                  = {arXiv preprint arXiv:1402.1128},
+  Year                     = {2014},
+
+  Abstract                 = {Long Short-Term Memory (LSTM) is a recurrent neural network
+(RNN) architecture that has been designed to address the vanishing and exploding gradient problems of conventional RNNs. Unlike
+feedforward neural networks, RNNs have cyclic connections making them powerful for modeling sequences. They have been successfully used for sequence labeling and sequence prediction tasks, such as handwriting recognition, language modeling, phonetic labeling of acoustic frames. However, in contrast to the deep neural networks, the use of RNNs in speech recognition has been limited to phone recognition in small scale tasks. In this paper, we present novel LSTM based RNN architectures which make more effective use of model parameters to train acoustic models for large vocabulary speech recognition. We train and compare LSTM, RNN and DNN models at various numbers of parameters and configurations. We show that LSTM models converge quickly and give state of the art speech recognition performance for relatively small sized models. 1},
+  Comment                  = {Speech reocgnition. Citations - 558},
+  Url                      = {https://arxiv.org/pdf/1402.1128}
+}
+
+@Article{Simonyan2014,
+  Title                    = {Very deep convolutional networks for large-scale image recognition},
+  Author                   = {Simonyan, Karen and Zisserman, Andrew},
+  Journal                  = {arXiv preprint arXiv:1409.1556},
+  Year                     = {2014},
+  Note                     = {Citation - 42522},
+
+  Abstract                 = {In this work we investigate the effect of the convolutional network depth on its accuracy in the large-scale image recognition setting. Our main contribution is a thorough evaluation of networks of increasing depth using an architecture with very small (3×3) convolution filters, which shows that a significant improvement on the prior-art configurations can be achieved by pushing the depth to 16–19 weight layers. These findings were the basis of our ImageNet Challenge 2014 submission, where our team secured the first and the second places in the localisation and classification tracks respectively. We also show that our representations generalise well to other datasets, where they achieve state-of-the-art results. We have made our two best-performing ConvNet models publicly available to facilitate further research on the use of deep visual representations in computer vision.},
+  Comment                  = {Alexnet},
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.14},
+  Url                      = {https://arxiv.org/pdf/1409.1556.pdf%20http://arxiv.org/abs/1409.1556}
+}
+
+@InProceedings{Szegedy2015,
+  Title                    = {Going deeper with convolutions},
+  Author                   = {Szegedy, Christian and Liu, Wei and Jia, Yangqing and Sermanet, Pierre and Reed, Scott and Anguelov, Dragomir and Erhan, Dumitru and Vanhoucke, Vincent and Rabinovich, Andrew},
+  Booktitle                = {Proceedings of the IEEE conference on computer vision and pattern recognition},
+  Year                     = {2015},
+  Note                     = {Citation - 23343},
+  Pages                    = {1--9},
+
+  Abstract                 = {We propose a deep convolutional neural network architecture codenamed Inception that achieves the new state of the art for classification and detection in the ImageNet Large-Scale Visual Recognition Challenge 2014 (ILSVRC14). The main hallmark of this architecture is the improved utilization of the computing resources inside the network. By a carefully crafted design, we increased the depth and width of the network while keeping the computational budget constant. To optimize quality, the architectural decisions were based on the Hebbian principle and the intuition of multi-scale processing. One particular incarnation used in our submission for ILSVRC14 is called GoogLeNet, a 22 layers deep network, the quality of which is assessed in the context of classification and detection.},
+  Comment                  = {GoogleNet},
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.14},
+  Url                      = {https://www.cv-foundation.org/openaccess/content_cvpr_2015/papers/Szegedy_Going_Deeper_With_2015_CVPR_paper.pdf}
+}
+
+@Article{Werbos1990,
+  Title                    = {Backpropagation through time: what it does and how to do it},
+  Author                   = {Werbos, Paul J},
+  Journal                  = {Proceedings of the IEEE},
+  Year                     = {1990},
+  Note                     = {Citations - 4271},
+  Number                   = {10},
+  Pages                    = {1550--1560},
+  Volume                   = {78},
+
+  Abstract                 = {Basic backpropagation, which is a simple method now being widely used in areas like pattern recognition and fault diagnosis, is reviewed. The basic equations for backpropagation through time, and applications to areas like pattern recognition involving dynamic systems, systems identification, and control are discussed. Further extensions of this method, to deal with systems other than neural networks, systems involving simultaneous equations, or true recurrent networks, and other practical issues arising with the method are described. Pseudocode is provided to clarify the algorithms. The chain rule for ordered derivatives-the theorem which underlies backpropagation-is briefly discussed. The focus is on designing a simpler version of backpropagation which can be translated into computer code and applied directly by neutral network users.< >},
+  Comment                  = {Backpropagation algorithm},
+  Owner                    = {manoj},
+  Publisher                = {IEEE},
+  Timestamp                = {2020.08.14},
+  Url                      = {http://axon.cs.byu.edu/Dan/678/papers/Recurrent/Werbos.pdf}
+}
+
+@Article{Williams2007,
+  Title                    = {Partially observable Markov decision processes for spoken dialog systems},
+  Author                   = {Williams, Jason D and Young, Steve},
+  Journal                  = {Computer Speech \& Language},
+  Year                     = {2007},
+  Number                   = {2},
+  Pages                    = {393--422},
+  Volume                   = {21},
+
+  Abstract                 = {In a spoken dialog system, determining which action a machine should take in a given situation is a difficult problem because automatic speech recognition is unreliable and hence the state of the conversation can never be known with certainty. Much of the research in spoken dialog systems centres on mitigating this uncertainty and recent work has focussed on three largely disparate techniques: parallel dialog state hypotheses, local use of confidence scores, and automated planning. While in isolation each of these approaches can improve action selection, taken together they currently lack a unified statistical framework that admits global optimization. In this paper we cast a spoken dialog system as a partially observable Markov decision process (POMDP). We show how this formulation unifies and extends existing techniques to form a single principled framework. A number of illustrations are used to show qualitatively the potential benefits of POMDPs compared to existing techniques, and empirical results from dialog simulations are presented which demonstrate significant quantitative gains. Finally, some of the key challenges to advancing this method – in particular scalability – are briefly outlined.},
+  Comment                  = {Markov decision process. Citations - 891},
+  Owner                    = {manoj},
+  Publisher                = {Elsevier},
+  Timestamp                = {2020.08.27},
+  Url                      = {http://svr-www.eng.cam.ac.uk/~sjy/papers/wiyo07-j.pdf}
+}
+
+@Article{williams2007partially,
+  Title                    = {Partially observable Markov decision processes for spoken dialog systems},
+  Author                   = {Williams, Jason D and Young, Steve},
+  Journal                  = {Computer Speech \& Language},
+  Year                     = {2007},
+  Number                   = {2},
+  Pages                    = {393--422},
+  Volume                   = {21},
+
+  Abstract                 = {In a spoken dialog system, determining which action a machine should take in a given situation is a difficult problem because automatic speech recognition is unreliable and hence the state of the conversation can never be known with certainty. Much of the research in spoken dialog systems centres on mitigating this uncertainty and recent work has focussed on three largely disparate techniques: parallel dialog state hypotheses, local use of confidence scores, and automated planning. While in isolation each of these approaches can improve action selection, taken together they currently lack a unified statistical framework that admits global optimization. In this paper we cast a spoken dialog system as a partially observable Markov decision process (POMDP). We show how this formulation unifies and extends existing techniques to form a single principled framework. A number of illustrations are used to show qualitatively the potential benefits of POMDPs compared to existing techniques, and empirical results from dialog simulations are presented which demonstrate significant quantitative gains. Finally, some of the key challenges to advancing this method – in particular scalability – are briefly outlined.},
+  Comment                  = {Markov decision process. Citations - 891},
+  Owner                    = {manoj},
+  Publisher                = {Elsevier},
+  Timestamp                = {2020.08.27},
+  Url                      = {http://svr-www.eng.cam.ac.uk/~sjy/papers/wiyo07-j.pdf}
+}
+
+@InProceedings{Zeiler2014,
+  Title                    = {Visualizing and understanding convolutional networks},
+  Author                   = {Zeiler, Matthew D and Fergus, Rob},
+  Booktitle                = {European conference on computer vision},
+  Year                     = {2014},
+  Note                     = {CItation - 9873},
+  Organization             = {Springer},
+  Pages                    = {818--833},
+
+  Abstract                 = {Large Convolutional Network models have recently demonstrated impressive classification performance on the ImageNet benchmark Krizhevsky et al. [18]. However there is no clear understanding of why they perform so well, or how they might be improved. In this paper we explore both issues. We introduce a novel visualization technique that gives insight into the function of intermediate feature layers and the operation of the classifier. Used in a diagnostic role, these visualizations allow us to find model architectures that outperform Krizhevsky et al. on the ImageNet classification benchmark. We also perform an ablation study to discover the performance contribution from different model layers. We show our ImageNet model generalizes well to other datasets: when the softmax classifier is retrained, it convincingly beats the current state-ofthe-art results on Caltech-101 and Caltech-256 datasets},
+  Comment                  = {ZFnet},
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.14},
+  Url                      = {https://link.springer.com/content/pdf/10.1007/978-3-319-10590-1_53.pdf}
+}
+
+@Article{Zhang2016,
+  Title                    = {Deep spatio-temporal residual networks for citywide crowd flows prediction},
+  Author                   = {Zhang, Junbo and Zheng, Yu and Qi, Dekang},
+  Journal                  = {arXiv preprint arXiv:1610.00081},
+  Year                     = {2016},
+
+  Abstract                 = {Forecasting the flow of crowds is of great importance to traffic management and public safety, and very challenging as it is affected by many complex factors, such as inter-region traffic, events, and weather. We propose a deep-learning-based approach, called ST-ResNet, to collectively forecast the inflow and outflow of crowds in each and every region of a city. We design an end-to-end structure of ST-ResNet based on unique properties of spatio-temporal data. More specifically, we employ the residual neural network framework to model the temporal closeness, period, and trend properties of crowd traffic. For each property, we design a branch of residual convolutional units, each of which models the spatial properties of crowd traffic. ST-ResNet learns to dynamically aggregate the output of the three residual neural networks based on data, assigning different weights to different branches and regions. The aggregation is further combined with external factors, such as weather and day of the week, to predict the final traffic of crowds in each and every region. Experiments on two types of crowd flows in Beijing and New York City (NYC) demonstrate that the proposed ST-ResNet outperforms six well-known methods.},
+  Comment                  = {MS Resnet},
+  Owner                    = {manoj},
+  Timestamp                = {2020.08.15},
+  Url                      = {https://arxiv.org/pdf/1610.00081}
+}
+

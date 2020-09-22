@@ -1963,5 +1963,10 @@ for the success of feedforward networks - lack of success is due to inadequate l
   booktitle = {Advances in neural information processing systems},
   title     = {Imagenet classification with deep convolutional neural networks},
   pages     = {1097--1105},
+  url       = {http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf},
+  abstract  = {We trained a large, deep convolutional neural network to classify the 1.2 millionhigh-resolution images in the ImageNet LSVRC-2010 contest into the 1000 dif-ferent classes. On the test data, we achieved top-1 and top-5 error rates of 37.5%and 17.0% which is considerably better than the previous state-of-the-art.   Theneural network, which has 60 million parameters and 650,000 neurons, consistsof five convolutional layers, some of which are followed by max-pooling layers,and three fully-connected layers with a final 1000-way softmax.  To make train-ing faster, we used non-saturating neurons and a very efficient GPU implemen-tation of the convolution operation.  To reduce overfitting in the fully-connectedlayers we employed a recently-developed regularization method called “dropout”that proved to be very effective.  We also entered a variant of this model in theILSVRC-2012 competition and achieved a winning top-5 test error rate of 15.3%,compared to 26.2% achieved by the second-best entry},
+  comment   = {ImageNet. Citations - 69143.},
   year      = {2012},
 }
+
+@Comment{jabref-meta: databaseType:bibtex;}
